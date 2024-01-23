@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+  <property>
+    <!--HDFS端口，主节点主机名shmain-->
+    <name>fs.defaultFS</name>
+    <value>hdfs://shmain:9000</value>
+  </property>
+</configuration>

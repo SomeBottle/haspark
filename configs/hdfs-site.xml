@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+
+<configuration>
+    <!--HDFS
+    NameNode和DataNode目录安置在somebottle用户默认目录下-->
+    <property>
+        <name>dfs.namenode.name.dir</name>
+        <value>file:///root/hdfs/name</value>
+        <description>NameNode directory for namespace and transaction logs storage.</description>
+    </property>
+    <property>
+        <name>dfs.datanode.data.dir</name>
+        <value>file:///root/hdfs/data</value>
+        <description>DataNode directory</description>
+    </property>
+    <property>
+        <name>dfs.replication</name>
+        <value>2</value>
+    </property>
+</configuration>
