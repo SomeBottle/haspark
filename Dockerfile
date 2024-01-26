@@ -27,8 +27,6 @@ USER root
 RUN echo $(openssl rand -base64 32) > /root/temp.pass
 # 修改root用户的密码
 RUN echo -e "$(cat /root/temp.pass)\n$(cat /root/temp.pass)" | passwd root
-# 把主机名写入文件
-RUN echo "$SH_HOSTS" > /root/exchange_hosts
 
 
 # 若.ssh目录不存在则建立
