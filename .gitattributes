@@ -1,0 +1,6 @@
+# 憋给我整成CRLF了嗷，不然保准没你好果汁吃嗷
+*.sh text eol=lf
+*.md text eol=lf
+configs/* text eol=lf
+resources/* text eol=lf
+scripts/* text eol=lf
