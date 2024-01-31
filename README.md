@@ -1,8 +1,8 @@
-# Hadoop + Spark 伪分布式容器化部署
+# Hadoop + Spark 分布式容器化部署
 
 本镜像基于`bitnami/spark:3.5.0`镜像，系统为`Debian 11`，执行用户为`root`。  
 
-面向本地集群环境测试，即**伪分布式**。
+面向本地集群环境测试，即**伪分布式**，应该也可以上线到真实容器集群中搭建成分布式（尚未测试）。
 
 * 本镜像配置完成，用docker compose上线容器后，能**自动交换SSH公钥实现节点间SSH免密登录**。
 * 本镜像在**WSL**上测试完成。
@@ -13,7 +13,7 @@
 * Hadoop `3.3.6`
 * Spark `3.5.0`  
 
-## 节点分配
+## 默认节点分配
 
 1 master + 2 workers.  
 
@@ -25,13 +25,35 @@
 
 | 名称 | 说明 | 默认值 |
 | --- | --- | --- |
-| HDFS_LAUNCH_ON_STARTUP | 是否在容器启动时自动启动HDFS（前提：`HADOOP_MODE`为`master`） | `"true"` |  
-| YARN_LAUNCH_ON_STARTUP | 是否在容器启动时自动启动Yarn （前提：`HADOOP_MODE`为`master`）| `"true"` |  
+| `HADOOP_MASTER` | HDFS NameNode所在主节点主机名 | 无 |
+| `HADOOP_WORKERS` | **空格分隔**的HDFS从节点主机名列表 | 无 |
+| `DN_ON_MASTER` | 在HDFS NameNode所在节点上是否启动DataNode | `"false"` |
+| `HDFS_REPLICATION` | HDFS副本数 | `2` |
+| `YARN_RM_NODE` | Yarn ResourceManager所在节点 | 无 |
+| `NM_WITH_RM` | 在ResourceManager所在节点是否启动NodeManager | `"false"` |
+| `NM_WITH_RM` | 在ResourceManager所在节点是否启动NodeManager | `"false"` |
+| `HDFS_LAUNCH_ON_STARTUP` | 是否在容器启动时自动启动HDFS各个节点的守护进程 | `"true"` |  
+| `YARN_LAUNCH_ON_STARTUP` | 是否在容器启动时自动启动Yarn各个节点的守护进程 | `"true"` |  
 
 ## 只读环境变量
 
-| 名称 | 说明 | 默认值 |
-| --- | --- | --- |
+除了`bitnami/spark`提供的只读环境变量外，本镜像还提供了:  
+
+| 名称 | 说明 | 
+| --- | --- | 
+|`HADOOP_VER` | Hadoop版本 | 
+|`HADOOP_HOME` | Hadoop安装目录 | 
+|`HADOOP_CONF_DIR` | Hadoop配置文件目录 |
+|`HADOOP_LOG_DIR` | Hadoop日志目录 | 
+|`SPARK_CONF_DIR` | Spark配置文件目录 |
+|`SH_HOSTS` | 集群中所有节点的主机名 |
+
+
+## 提供的脚本
+
+### 1. 查询集群各容器的Java进程
+
+在命令行执行`jpsall`即可，脚本实际位于`/opt/tools/jpsall`。  
 
 ## 容器部署
 
@@ -62,7 +84,7 @@ version: '3'
 
 services:
   haspark-main:
-    image: somebottle/haspark:3.0.3
+    image: somebottle/haspark:3.1.0
     hostname: shmain
     environment:
       - SH_HOSTS='shmain shworker1 shworker2'
@@ -83,7 +105,7 @@ services:
       - '9870:9870'
       - '19888:19888'
   haspark-worker-1:
-    image: somebottle/haspark:3.0.3
+    image: somebottle/haspark:3.1.0
     hostname: shworker1
     environment:
       - SPARK_MODE=worker
@@ -100,7 +122,7 @@ services:
     ports:
       - '8081:8081'
   haspark-worker-2:
-    image: somebottle/haspark:3.0.3
+    image: somebottle/haspark:3.1.0
     hostname: shworker2
     environment:
       - SPARK_MODE=worker
@@ -167,43 +189,7 @@ Hadoop集群停止脚本：
 /opt/stop-hadoop.sh  
 ```
 
-## 重构建容器镜像
 
-### 修改节点数
-
-默认的节点主机名是:  
-
-- `shmain` (master)
-- `shworker1` (worker1)
-- `shworker2` (worker2)
-
-如果你要修改节点主机名或者新增工人(worker)节点：  
-
-1. 修改`docker-compose.yml`的`hostname`, `SPARK_MASTER_URL`，目录挂载等配置。  
-2. 修改`Dockerfile`头部的`SH_HOSTS`环境变量。
-3. 修改`Hadoop`相关配置。主要是`core-site.xml`, `workers`文件，可能也要改动`yarn-site.xml`。
-4. 修改`ssh_config`配置文件。
-5. 重新构建镜像。  
-
-    ```bash
-    docker build -t somebottle/haspark[:tag] . --network host
-    ```
-
-    > `--network host` 在WSL平台上很有效，采用和宿主机相同的网络，否则可能在容器内无法联网。 
-
-### 修改目录
-
-如果你想以非root用户来运行容器，那么就需要进行比较大面积的改动。  
-
-你可能需要改动的文件:  
-
-1. `docker-compose.yml`  
-2. `Dockerfile`
-3. Hadoop配置: `hdfs-site.xml`  
-4. 脚本`ssh_key_exchange.sh`  
-5. 脚本`start-hadoop.sh`  
-
-然后重新构建镜像即可。
 
 ## 感谢
 

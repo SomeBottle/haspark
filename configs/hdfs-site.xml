@@ -18,4 +18,14 @@
         <name>dfs.replication</name>
         <value>%%HDFS_REPLICATION%%</value>
     </property>
+    <property>
+        <!--
+            取消DataNode节点所在主机的主机名（DNS）与对应IP地址的检查机制，
+            防止DataNode分裂。  
+
+            参考： https://zhuanlan.zhihu.com/p/463682863
+        -->
+        <name>dfs.namenode.datanode.registration.ip-hostname-check</name>
+        <value>false</value>
+    </property>
 </configuration>

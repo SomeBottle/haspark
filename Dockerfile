@@ -16,7 +16,7 @@ ENV HADOOP_CONF_DIR="/opt/hadoop/etc/hadoop"
 # Hadoop日志目录
 ENV HADOOP_LOG_DIR="/var/log/hadoop"
 # 把Hadoop目录加入环境变量
-ENV PATH="$HADOOP_HOME/sbin:$HADOOP_HOME/bin:$PATH"
+ENV PATH="$HADOOP_HOME/sbin:$HADOOP_HOME/bin:/opt/tools:$PATH"
 # 临时密码文件路径加入环境变量
 ENV TEMP_PASS_FILE="/root/temp.pass"
 # 用户.ssh配置目录
@@ -25,9 +25,17 @@ ENV USR_SSH_CONF_DIR="/root/.ssh"
 ENV HDFS_LAUNCH_ON_STARTUP="true"
 # Hadoop YARN是否随容器一并启动
 ENV YARN_LAUNCH_ON_STARTUP="true"
+# 容器初次启动标识文件
+ENV INIT_FLAG_FILE="/root/init_flag"
 
 # 以Root用户完成
 USER root
+
+# 将环境变量写入/etc/profile.d/container_env.sh
+RUN echo -e '#!/bin/bash\nexport PATH='$PATH > /etc/profile.d/container_env.sh
+
+# 创建容器启动标识文件
+RUN touch $INIT_FLAG_FILE
 
 # 先生成一个临时SSH密码，用于首次启动时交换ssh密钥
 RUN echo $(openssl rand -base64 32) > $TEMP_PASS_FILE
@@ -79,6 +87,11 @@ RUN chmod 600 $USR_SSH_CONF_DIR/config \
 # 拷贝启动脚本
 COPY scripts/* /opt/
 
+# 建立HDFS目录以及工具脚本目录
+RUN mkdir -p /root/hdfs/name \ 
+    && mkdir -p /root/hdfs/data \
+    && mkdir -p /opt/tools 
+
 # 增加执行权限
 RUN chmod +x /opt/start-hadoop.sh \
     && chmod +x /opt/stop-hadoop.sh \
@@ -90,12 +103,11 @@ RUN chmod +x /opt/start-hadoop.sh \
     && chmod +x $HADOOP_HOME/sbin/stop-dfs.sh \
     && chmod +x $HADOOP_HOME/sbin/stop-yarn.sh 
 
-# 建立HDFS目录
-RUN mkdir -p /root/hdfs/name \ 
-    && mkdir -p /root/hdfs/data 
+# 拷贝工具脚本
+COPY tools/* /opt/tools/
+# 给所有工具脚本加上可执行权限
+RUN chmod +x /opt/tools/*
 
-# 初始化HDFS
-RUN hdfs namenode -format
 
 # 容器启动待执行的脚本
 ENTRYPOINT [ "/opt/entry.sh" ]

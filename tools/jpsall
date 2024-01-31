@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# 临时密码文件还存在就说明SSH公钥还没交换完毕，需要等待交换完毕
+while [ -e $TEMP_PASS_FILE ]; do
+    sleep 3
+done
+
+echo "Listing Java Processes..."
+
+for host in $SH_HOSTS
+do
+    echo ============= $host ==========
+    ssh root@$host /opt/bitnami/java/bin/jps
+done

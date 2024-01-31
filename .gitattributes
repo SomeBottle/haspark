@@ -4,3 +4,4 @@
 configs/* text eol=lf
 resources/* text eol=lf
 scripts/* text eol=lf
+tools/* text eol=lf
