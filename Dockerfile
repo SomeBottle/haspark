@@ -7,6 +7,14 @@ LABEL maintainer="somebottle <somebottle@gmail.com>"
 LABEL description="Docker image with Spark 3.5.0 and Hadoop 3.3.6, based on bitnami/spark image. For my graduation project." 
 
 # 环境变量配置
+# Zookeeper版本
+ENV ZOOKEEPER_VER="3.9.1"
+# Zookeeper安装目录
+ENV ZOOKEEPER_HOME="/opt/zookeeper"
+# Zookeeper配置目录
+ENV ZOOKEEPER_CONF_DIR="/opt/zookeeper/conf"
+# Zookeeper数据目录
+ENV ZOOKEEPER_DATA_DIR="/root/zooData"
 # Hadoop版本
 ENV HADOOP_VER="3.3.6" 
 # Hadoop安装目录
@@ -16,7 +24,7 @@ ENV HADOOP_CONF_DIR="/opt/hadoop/etc/hadoop"
 # Hadoop日志目录
 ENV HADOOP_LOG_DIR="/var/log/hadoop"
 # 把Hadoop目录加入环境变量
-ENV PATH="$HADOOP_HOME/sbin:$HADOOP_HOME/bin:/opt/tools:$PATH"
+ENV PATH="$HADOOP_HOME/sbin:$HADOOP_HOME/bin:/opt/tools:$ZOOKEEPER_HOME/bin:$PATH"
 # 临时密码文件路径加入环境变量
 ENV TEMP_PASS_FILE="/root/temp.pass"
 # 用户.ssh配置目录
@@ -80,6 +88,21 @@ RUN mv /tmp/tmp_configs/core-site.xml ${HADOOP_CONF_DIR}/core-site.xml \
     && mv /tmp/tmp_configs/sshd_config /etc/ssh/sshd_config \
     && rm -rf /tmp/tmp_configs
 
+# 下载Zookeeper并解压至/opt/zookeeper
+RUN wget https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/zookeeper-${ZOOKEEPER_VER}/apache-zookeeper-${ZOOKEEPER_VER}-bin.tar.gz \
+    && tar -zxf apache-zookeeper-${ZOOKEEPER_VER}-bin.tar.gz \
+    && mv apache-zookeeper-${ZOOKEEPER_VER}-bin zookeeper \
+    && rm -f apache-zookeeper-${ZOOKEEPER_VER}-bin.tar.gz
+
+# 拷贝Zookeeper基础配置文件
+RUN cp /opt/zookeeper/conf/zoo_sample.cfg /opt/zookeeper/conf/zoo.cfg
+
+# 修改Zookeeper数据目录
+RUN sed -i "s|dataDir=/tmp/zookeeper|dataDir=$ZOOKEEPER_DATA_DIR|" /opt/zookeeper/conf/zoo.cfg
+
+# 建立Zookeeper数据目录
+RUN mkdir -p $ZOOKEEPER_DATA_DIR
+
 # 调整.ssh目录下文件权限
 RUN chmod 600 $USR_SSH_CONF_DIR/config \
     && chmod 700 $USR_SSH_CONF_DIR
@@ -93,15 +116,9 @@ RUN mkdir -p /root/hdfs/name \
     && mkdir -p /opt/tools 
 
 # 增加执行权限
-RUN chmod +x /opt/start-hadoop.sh \
-    && chmod +x /opt/stop-hadoop.sh \
-    && chmod +x /opt/hadoop-setup.sh \
-    && chmod +x /opt/entry.sh \
-    && chmod +x /opt/ssh_key_exchange.sh \
-    && chmod +x $HADOOP_HOME/sbin/start-dfs.sh \
-    && chmod +x $HADOOP_HOME/sbin/start-yarn.sh \
-    && chmod +x $HADOOP_HOME/sbin/stop-dfs.sh \
-    && chmod +x $HADOOP_HOME/sbin/stop-yarn.sh 
+RUN chmod +x /opt/*.sh \
+    && chmod +x $HADOOP_HOME/sbin/*.sh \
+    && chmod +x $ZOOKEEPER_HOME/bin/*.sh
 
 # 拷贝工具脚本
 COPY tools/* /opt/tools/

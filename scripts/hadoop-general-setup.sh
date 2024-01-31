@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Hadoop初始化/初启动脚本
+# Hadoop常规初始化/初启动脚本
 
 if [ -e $INIT_FLAG_FILE ]; then
     # 仅在容器初次启动时执行
@@ -11,10 +11,10 @@ if [ -e $INIT_FLAG_FILE ]; then
     sed -i "s/%%HDFS_REPLICATION%%/$HDFS_REPLICATION/g" $HADOOP_CONF_DIR/hdfs-site.xml
     # 修改yarn-site.xml
     sed -i "s/%%YARN_RM_NODE%%/$YARN_RM_NODE/g" $HADOOP_CONF_DIR/yarn-site.xml
-    
+
     # 修改workers文件
     for worker in $HADOOP_WORKERS; do
-        echo $worker >> $HADOOP_CONF_DIR/workers
+        echo $worker >>$HADOOP_CONF_DIR/workers
     done
     # 初始化HDFS
     echo "Formatting HDFS..."
@@ -33,6 +33,11 @@ if [ "$HADOOP_MASTER" = "$(hostname)" ]; then
             echo "Starting DataNode on master..."
             hdfs --daemon start datanode # 常规模式启动datanode
         fi
+    fi
+    # 顺带启动NodeManager
+    if [[ -z "$YARN_LAUNCH_ON_STARTUP" || "$YARN_LAUNCH_ON_STARTUP" != "false" ]]; then
+        echo "Starting NodeManager..."
+        yarn --daemon start nodemanager # 启动nodemanager
     fi
 else
     echo "This node is not a Hadoop HDFS master."

@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# Zookeeper集群管理脚本
+
+# 先让环境变量生效
+source /etc/profile
+
+#! /bin/bash
+case $1 in
+"start") {
+    for host in $SH_HOSTS; do
+        echo ============= starting zk on $host ==========
+        ssh root@$host "source /etc/profile; $ZOOKEEPER_HOME/bin/zkServer.sh start "
+    done
+} ;;
+"stop") {
+    for host in $SH_HOSTS; do
+        echo ============= stopping zk on $host ==========
+        ssh root@$host "source /etc/profile; $ZOOKEEPER_HOME/bin/zkServer.sh stop "
+    done
+} ;;
+"status") {
+    for host in $SH_HOSTS; do
+        echo ============= zk status on $host ==========
+        ssh root@$host "source /etc/profile; $ZOOKEEPER_HOME/bin/zkServer.sh status "
+    done
+} ;;
+*)
+    echo "Usage: $0 <start|stop|status>"
+    ;;
+esac

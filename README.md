@@ -41,6 +41,10 @@
 
 | 名称 | 说明 | 
 | --- | --- | 
+|`ZOOKEEPER_VER` | Zookeeper版本 | 
+|`ZOOKEEPER_HOME` | Zookeeper安装目录 | 
+|`ZOOKEEPER_CONF_DIR` | Zookeeper配置目录 | 
+|`ZOOKEEPER_DATA_DIR` | Zookeeper数据目录（`zoo.cfg`中的`dataDir`配置） | 
 |`HADOOP_VER` | Hadoop版本 | 
 |`HADOOP_HOME` | Hadoop安装目录 | 
 |`HADOOP_CONF_DIR` | Hadoop配置文件目录 |
@@ -53,7 +57,13 @@
 
 ### 1. 查询集群各容器的Java进程
 
-在命令行执行`jpsall`即可，脚本实际位于`/opt/tools/jpsall`。  
+在命令行执行`jpsall`即可，脚本实际位于`/opt/tools/jpsall`。 
+
+### 2. Zookeeper集群管理脚本
+
+命令行: `zoo <start|stop|status>`  
+
+脚本实际位于`/opt/tools/zoo`。
 
 ## 容器部署
 
