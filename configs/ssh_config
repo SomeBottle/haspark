@@ -4,11 +4,3 @@ Host localhost
 Host 0.0.0.0
   StrictHostKeyChecking no
 
-Host shmain
-  StrictHostKeyChecking no
-
-Host shworker1
-  StrictHostKeyChecking no
-
-Host shworker2
-  StrictHostKeyChecking no

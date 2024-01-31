@@ -4,6 +4,6 @@
   <property>
     <!--HDFS端口，主节点主机名shmain-->
     <name>fs.defaultFS</name>
-    <value>hdfs://shmain:9000</value>
+    <value>hdfs://%%HADOOP_MASTER%%:9000</value>
   </property>
 </configuration>

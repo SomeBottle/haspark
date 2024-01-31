@@ -7,8 +7,6 @@ LABEL maintainer="somebottle <somebottle@gmail.com>"
 LABEL description="Docker image with Spark 3.5.0 and Hadoop 3.3.6, based on bitnami/spark image. For my graduation project." 
 
 # 环境变量配置
-# 所有节点的主机名，用于SSH配置
-ENV SH_HOSTS="shmain shworker1 shworker2"
 # Hadoop版本
 ENV HADOOP_VER="3.3.6" 
 # Hadoop安装目录
@@ -21,6 +19,8 @@ ENV HADOOP_LOG_DIR="/var/log/hadoop"
 ENV PATH="$HADOOP_HOME/sbin:$HADOOP_HOME/bin:$PATH"
 # 临时密码文件路径加入环境变量
 ENV TEMP_PASS_FILE="/root/temp.pass"
+# 用户.ssh配置目录
+ENV USR_SSH_CONF_DIR="/root/.ssh"
 # Hadoop HDFS是否随容器一并启动
 ENV HDFS_LAUNCH_ON_STARTUP="true"
 # Hadoop YARN是否随容器一并启动
@@ -36,9 +36,9 @@ RUN echo -e "$(cat $TEMP_PASS_FILE)\n$(cat $TEMP_PASS_FILE)" | passwd root
 
 
 # 若.ssh目录不存在则建立
-RUN [ -d /root/.ssh ] || mkdir -p /root/.ssh
+RUN [ -d $USR_SSH_CONF_DIR ] || mkdir -p $USR_SSH_CONF_DIR
 # 建立标记目录
-RUN mkdir -p /root/.ssh/exchange_flags
+RUN mkdir -p $USR_SSH_CONF_DIR/exchange_flags
 
 # 更换镜像源
 COPY resources/sources.list /tmp/sources.list
@@ -68,13 +68,13 @@ RUN mv /tmp/tmp_configs/core-site.xml ${HADOOP_CONF_DIR}/core-site.xml \
     && mv /tmp/tmp_configs/yarn-site.xml ${HADOOP_CONF_DIR}/yarn-site.xml \
     && mv /tmp/tmp_configs/hadoop-env.sh ${HADOOP_CONF_DIR}/hadoop-env.sh \
     && mv /tmp/tmp_configs/workers ${HADOOP_CONF_DIR}/workers \
-    && mv /tmp/tmp_configs/ssh_config /root/.ssh/config \
+    && mv /tmp/tmp_configs/ssh_config $USR_SSH_CONF_DIR/config \
     && mv /tmp/tmp_configs/sshd_config /etc/ssh/sshd_config \
     && rm -rf /tmp/tmp_configs
 
 # 调整.ssh目录下文件权限
-RUN chmod 600 /root/.ssh/config \
-    && chmod 700 /root/.ssh
+RUN chmod 600 $USR_SSH_CONF_DIR/config \
+    && chmod 700 $USR_SSH_CONF_DIR
 
 # 拷贝启动脚本
 COPY scripts/* /opt/
@@ -82,6 +82,7 @@ COPY scripts/* /opt/
 # 增加执行权限
 RUN chmod +x /opt/start-hadoop.sh \
     && chmod +x /opt/stop-hadoop.sh \
+    && chmod +x /opt/hadoop-setup.sh \
     && chmod +x /opt/entry.sh \
     && chmod +x /opt/ssh_key_exchange.sh \
     && chmod +x $HADOOP_HOME/sbin/start-dfs.sh \

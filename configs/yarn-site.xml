@@ -11,7 +11,7 @@
     </property>
     <property>
         <name>yarn.resourcemanager.hostname</name>
-        <value>shmain</value>
+        <value>%%YARN_RM_NODE%%</value>
     </property>
     <property>
         <name>yarn.nodemanager.env-whitelist</name>

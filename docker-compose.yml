@@ -4,15 +4,9 @@ services:
   haspark-main:
     image: somebottle/haspark:3.0.3
     hostname: shmain
+    env_file: ./common.env
     environment:
       - SPARK_MODE=master
-      - SPARK_RPC_AUTHENTICATION_ENABLED=no
-      - SPARK_RPC_ENCRYPTION_ENABLED=no
-      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
-      - SPARK_SSL_ENABLED=no
-      - HADOOP_MODE=master # 在主容器中其启动Hadoop集群, HDFS_LAUNCH_ON_STARTUP和YARN_LAUNCH_ON_STARTUP环境变量在HADOOP_MODE=master时才有效
-      - HDFS_LAUNCH_ON_STARTUP=true
-      - YARN_LAUNCH_ON_STARTUP=false # 启动容器时不启动Yarn集群
     volumes:
       - haspark-hdfs-name-data:/root/hdfs/name:copy # 映射docker卷到主容器的/root/hdfs/name，创建卷时复制镜像中初始化过的namenode数据
       - ~/docker/spark/share:/opt/share # 三个容器映射到相同的共享目录
@@ -26,15 +20,12 @@ services:
   haspark-worker-1:
     image: somebottle/haspark:3.0.3
     hostname: shworker1
+    env_file: ./common.env
     environment:
       - SPARK_MODE=worker
       - SPARK_MASTER_URL=spark://shmain:7077
       - SPARK_WORKER_MEMORY=1G
       - SPARK_WORKER_CORES=1
-      - SPARK_RPC_AUTHENTICATION_ENABLED=no
-      - SPARK_RPC_ENCRYPTION_ENABLED=no
-      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
-      - SPARK_SSL_ENABLED=no
     volumes:
       - ~/docker/spark/share:/opt/share
       - haspark-hdfs-worker1-data:/root/hdfs/data # datanode数据
@@ -43,15 +34,12 @@ services:
   haspark-worker-2:
     image: somebottle/haspark:3.0.3
     hostname: shworker2
+    env_file: ./common.env
     environment:
       - SPARK_MODE=worker
       - SPARK_MASTER_URL=spark://shmain:7077
       - SPARK_WORKER_MEMORY=1G
       - SPARK_WORKER_CORES=1
-      - SPARK_RPC_AUTHENTICATION_ENABLED=no
-      - SPARK_RPC_ENCRYPTION_ENABLED=no
-      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
-      - SPARK_SSL_ENABLED=no
     volumes:
       - ~/docker/spark/share:/opt/share
       - haspark-hdfs-worker2-data:/root/hdfs/data # datanode数据

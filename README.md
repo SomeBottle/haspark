@@ -19,15 +19,19 @@
 
 > 如果需要修改则需要[编辑多个文件](#修改节点数)进行重新构建。
 
-## 特殊环境变量  
+## 可配置的环境变量  
 
 在`bitnami/spark`的基础上添加如下环境变量: 
 
 | 名称 | 说明 | 默认值 |
 | --- | --- | --- |
-| HADOOP_MODE | Hadoop模式，若设为`master`则会在此容器中执行启动集群的指令 | 空 |  
 | HDFS_LAUNCH_ON_STARTUP | 是否在容器启动时自动启动HDFS（前提：`HADOOP_MODE`为`master`） | `"true"` |  
 | YARN_LAUNCH_ON_STARTUP | 是否在容器启动时自动启动Yarn （前提：`HADOOP_MODE`为`master`）| `"true"` |  
+
+## 只读环境变量
+
+| 名称 | 说明 | 默认值 |
+| --- | --- | --- |
 
 ## 容器部署
 
