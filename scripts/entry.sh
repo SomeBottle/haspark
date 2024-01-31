@@ -12,7 +12,19 @@ nohup /opt/ssh_key_exchange.sh > exchange.log 2>&1 &
 # 如果 HADOOP_MODE 为 master，则启动 Hadoop 集群
 if [ "$HADOOP_MODE" = "master" ]; then
     # 在主容器下启动 Hadoop
-    nohup /opt/start-hadoop.sh > hadoop_launch.log 2>&1 &
+    # 临时密码文件还存在就说明SSH公钥还没交换完毕，需要等待交换完毕后再启动Hadoop
+    while [ -e $TEMP_PASS_FILE ]; do
+        sleep 3
+    done
+    # 读取环境变量，启动Hadoop组件
+    if [[ -z "$HDFS_LAUNCH_ON_STARTUP" || "$HDFS_LAUNCH_ON_STARTUP" != "false" ]]; then
+        echo "Starting HDFS..."
+        $HADOOP_HOME/sbin/start-dfs.sh
+    fi
+    if [[ -z "$YARN_LAUNCH_ON_STARTUP" || "$YARN_LAUNCH_ON_STARTUP" != "false" ]]; then
+        echo "Starting YARN..."
+        $HADOOP_HOME/sbin/start-yarn.sh
+    fi
 else
     echo "Hadoop will not automatically start in this container. Set HADOOP_MODE to 'master' to start."
 fi

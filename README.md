@@ -26,6 +26,8 @@
 | 名称 | 说明 | 默认值 |
 | --- | --- | --- |
 | HADOOP_MODE | Hadoop模式，若设为`master`则会在此容器中执行启动集群的指令 | 空 |  
+| HDFS_LAUNCH_ON_STARTUP | 是否在容器启动时自动启动HDFS（前提：`HADOOP_MODE`为`master`） | `"true"` |  
+| YARN_LAUNCH_ON_STARTUP | 是否在容器启动时自动启动Yarn （前提：`HADOOP_MODE`为`master`）| `"true"` |  
 
 ## 容器部署
 
@@ -56,9 +58,10 @@ version: '3'
 
 services:
   haspark-main:
-    image: somebottle/haspark:3.0.2
+    image: somebottle/haspark:3.0.3
     hostname: shmain
     environment:
+      - SH_HOSTS='shmain shworker1 shworker2'
       - SPARK_MODE=master
       - SPARK_RPC_AUTHENTICATION_ENABLED=no
       - SPARK_RPC_ENCRYPTION_ENABLED=no
@@ -76,7 +79,7 @@ services:
       - '9870:9870'
       - '19888:19888'
   haspark-worker-1:
-    image: somebottle/haspark:3.0.2
+    image: somebottle/haspark:3.0.3
     hostname: shworker1
     environment:
       - SPARK_MODE=worker
@@ -93,7 +96,7 @@ services:
     ports:
       - '8081:8081'
   haspark-worker-2:
-    image: somebottle/haspark:3.0.2
+    image: somebottle/haspark:3.0.3
     hostname: shworker2
     environment:
       - SPARK_MODE=worker

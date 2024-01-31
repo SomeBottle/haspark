@@ -1,7 +1,6 @@
 #!/bin/bash
 
 FLAG_DIR="/root/.ssh/exchange_flags"
-TEMP_PASS_FILE="/root/temp.pass"
 # 重试公钥分发次数
 # 因为其他容器SSH服务还没有完全启动时，有概率会导致公钥分发失败
 MAX_RETRY=7

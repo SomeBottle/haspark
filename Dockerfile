@@ -19,14 +19,20 @@ ENV HADOOP_CONF_DIR="/opt/hadoop/etc/hadoop"
 ENV HADOOP_LOG_DIR="/var/log/hadoop"
 # 把Hadoop目录加入环境变量
 ENV PATH="$HADOOP_HOME/sbin:$HADOOP_HOME/bin:$PATH"
+# 临时密码文件路径加入环境变量
+ENV TEMP_PASS_FILE="/root/temp.pass"
+# Hadoop HDFS是否随容器一并启动
+ENV HDFS_LAUNCH_ON_STARTUP="true"
+# Hadoop YARN是否随容器一并启动
+ENV YARN_LAUNCH_ON_STARTUP="true"
 
 # 以Root用户完成
 USER root
 
 # 先生成一个临时SSH密码，用于首次启动时交换ssh密钥
-RUN echo $(openssl rand -base64 32) > /root/temp.pass
+RUN echo $(openssl rand -base64 32) > $TEMP_PASS_FILE
 # 修改root用户的密码
-RUN echo -e "$(cat /root/temp.pass)\n$(cat /root/temp.pass)" | passwd root
+RUN echo -e "$(cat $TEMP_PASS_FILE)\n$(cat $TEMP_PASS_FILE)" | passwd root
 
 
 # 若.ssh目录不存在则建立
