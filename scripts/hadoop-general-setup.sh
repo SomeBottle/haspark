@@ -21,62 +21,43 @@ if [ -e $INIT_FLAG_FILE ]; then
     hdfs namenode -format
 fi
 
-# 如果本机为Hadoop HDFS的master，则启动HDFS
-if [ "$HADOOP_MASTER" = "$(hostname)" ]; then
-    # 在主容器下启动 Hadoop
-    # 读取环境变量，是否启动Hadoop HDFS组件
-    if [[ -z "$HDFS_LAUNCH_ON_STARTUP" || "$HDFS_LAUNCH_ON_STARTUP" != "false" ]]; then
-        echo "Starting HDFS NameNode..."
+# ***************** Hadoop组件启动逻辑 *****************
+# ####### HDFS部分 #######
+if [[ "$HDFS_LAUNCH_ON_STARTUP" == "true" ]]; then
+    # 如果本机为Hadoop HDFS的master，则启动NameNode
+    if [[ "$HADOOP_MASTER" == "$(hostname)" ]]; then
+        echo "Starting HDFS NameNode on $(hostname)..."
         hdfs --daemon start namenode # 启动namenode
-        # 如果配置了DN_ON_MASTER，则启动DataNode
-        if [ "$DN_ON_MASTER" = "true" ]; then
-            echo "Starting DataNode on master..."
+        # 如果配置了DN_ON_MASTER，则还在本节点启动DataNode
+        if [[ "$DN_ON_MASTER" == "true" ]]; then
+            echo "Starting DataNode on $(hostname)..."
             hdfs --daemon start datanode # 常规模式启动datanode
         fi
     fi
-    # 顺带启动NodeManager
-    if [[ -z "$YARN_LAUNCH_ON_STARTUP" || "$YARN_LAUNCH_ON_STARTUP" != "false" ]]; then
-        echo "Starting NodeManager..."
-        yarn --daemon start nodemanager # 启动nodemanager
-    fi
-else
-    echo "This node is not a Hadoop HDFS master."
-fi
-
-# 如果本机为Yarn的master
-if [ "$YARN_RM_NODE" = "$(hostname)" ]; then
-    # 是否启动Yarn集群
-    if [[ -z "$YARN_LAUNCH_ON_STARTUP" || "$YARN_LAUNCH_ON_STARTUP" != "false" ]]; then
-        echo "Starting Yarn ResourceManager..."
-        yarn --daemon start resourcemanager # 启动resourcemanager
-        # 如果配置了NM_WITH_RM，则启动NodeManager
-        if [ "$NM_WITH_RM" = "true" ]; then
-            echo "Starting NodeManager..."
-            yarn --daemon start nodemanager # 启动nodemanager
-        fi
-    fi
-else
-    echo "This node is not a Hadoop Yarn master."
-fi
-
-# 如果本机为工作结点，启动DataNode
-# 用通配符判断本机主机名是否在HADOOP_WORKERS中
-if [[ "$HADOOP_WORKERS" == *$(hostname)* ]]; then
-    # 是否启动DataNode
-    # HADOOP_WORKERS中肯定不会有HADOOP_MASTER结点
-    if [[ -z "$HDFS_LAUNCH_ON_STARTUP" || "$HDFS_LAUNCH_ON_STARTUP" != "false" ]]; then
-        echo "Starting DataNode..."
+    # 如果本机为工作结点，启动DataNode
+    # 用通配符判断本机主机名是否在HADOOP_WORKERS中
+    if [[ "$HADOOP_WORKERS" == *$(hostname)* ]]; then
+        # HADOOP_WORKERS中肯定不会有HADOOP_MASTER结点
+        echo "Starting DataNode on worker node $(hostname)..."
         hdfs --daemon start datanode # 常规模式启动datanode
     fi
 fi
 
-# 如果本机为工作结点，【且不是ResourceManager所在结点】，则启动NodeManager和DataNode
-# ResourceManager所在结点的情况在上面已经处理了
-if [[ "$HADOOP_WORKERS" == *$(hostname)* && "$YARN_RM_NODE" != "$(hostname)" ]]; then
-    # 是否启动NodeManager
-    # HADOOP_WORKERS中肯定不会有HADOOP_MASTER结点
-    if [[ -z "$YARN_LAUNCH_ON_STARTUP" || "$YARN_LAUNCH_ON_STARTUP" != "false" ]]; then
-        echo "Starting NodeManager..."
+# ####### Yarn部分 #######
+# 是否启动Yarn集群
+if [[ "$YARN_LAUNCH_ON_STARTUP" == "true" ]]; then
+    # 如果本机为Yarn的ResourceManager所在节点
+    if [[ "$YARN_RM_NODE" == "$(hostname)" ]]; then
+        echo "Starting Yarn ResourceManager on $(hostname)..."
+        yarn --daemon start resourcemanager # 启动resourcemanager
+        # 如果配置了NM_WITH_RM，则还要在此节点启动NodeManager
+        if [[ "$NM_WITH_RM" == "true" ]]; then
+            echo "Starting NodeManager on $(hostname)..."
+            yarn --daemon start nodemanager # 启动nodemanager
+        fi
+    elif [[ "$SH_HOSTS" = *$(hostname)* ]]; then
+        # 如果不是ResourceManager所在节点
+        echo "Starting NodeManager on $(hostname)..."
         yarn --daemon start nodemanager # 启动nodemanager
     fi
 fi

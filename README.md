@@ -32,8 +32,8 @@
 | `YARN_RM_NODE` | Yarn ResourceManager所在节点 | 无 |
 | `NM_WITH_RM` | 在ResourceManager所在节点是否启动NodeManager | `"false"` |
 | `NM_WITH_RM` | 在ResourceManager所在节点是否启动NodeManager | `"false"` |
-| `HDFS_LAUNCH_ON_STARTUP` | 是否在容器启动时自动启动HDFS各个节点的守护进程 | `"true"` |  
-| `YARN_LAUNCH_ON_STARTUP` | 是否在容器启动时自动启动Yarn各个节点的守护进程 | `"true"` |  
+| `HDFS_LAUNCH_ON_STARTUP` | 是否在容器启动时自动启动HDFS各个节点的守护进程 | `"false"` |  
+| `YARN_LAUNCH_ON_STARTUP` | 是否在容器启动时自动启动Yarn各个节点的守护进程 | `"false"` |  
 
 ## 只读环境变量
 
