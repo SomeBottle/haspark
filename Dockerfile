@@ -35,6 +35,8 @@ ENV HDFS_LAUNCH_ON_STARTUP="true"
 ENV YARN_LAUNCH_ON_STARTUP="true"
 # 容器初次启动标识文件
 ENV INIT_FLAG_FILE="/root/init_flag"
+# 高可用-HDFS Nameservice
+ENV HA_HDFS_NAMESERVICE="hacluster"
 
 # 以Root用户完成
 USER root
@@ -113,6 +115,7 @@ COPY scripts/* /opt/
 # 建立HDFS目录以及工具脚本目录
 RUN mkdir -p /root/hdfs/name \ 
     && mkdir -p /root/hdfs/data \
+    && mkdir -p /root/hdfs/journal \
     && mkdir -p /opt/tools 
 
 # 增加执行权限

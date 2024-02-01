@@ -5,8 +5,13 @@
 if [ -e $INIT_FLAG_FILE ]; then
     # 仅在容器初次启动时执行
     # 修改配置文件
+    # 因为不是高可用模式，剔除配置文件中的高可用配置
+    sed -i '/@#HA_CONF_START#@/,/@#HA_CONF_END#@/d' $HADOOP_CONF_DIR/core-site.xml
+    sed -i '/@#HA_CONF_START#@/,/@#HA_CONF_END#@/d' $HADOOP_CONF_DIR/yarn-site.xml
+    sed -i '/@#HA_CONF_START#@/,/@#HA_CONF_END#@/d' $HADOOP_CONF_DIR/hdfs-site.xml
+    sed -i '/@#HA_CONF_START#@/,/@#HA_CONF_END#@/d' $HADOOP_CONF_DIR/mapred-site.xml
     # 修改core-site.xml
-    sed -i "s/%%HADOOP_MASTER%%/$HADOOP_MASTER/g" $HADOOP_CONF_DIR/core-site.xml
+    sed -i "s/%%HDFS_DEF_HOST%%/$HADOOP_MASTER:8020/g" $HADOOP_CONF_DIR/core-site.xml
     # 修改hdfs-site.xml
     sed -i "s/%%HDFS_REPLICATION%%/$HDFS_REPLICATION/g" $HADOOP_CONF_DIR/hdfs-site.xml
     # 修改yarn-site.xml
@@ -40,6 +45,11 @@ if [[ "$HDFS_LAUNCH_ON_STARTUP" == "true" ]]; then
         # HADOOP_WORKERS中肯定不会有HADOOP_MASTER结点
         echo "Starting DataNode on worker node $(hostname)..."
         hdfs --daemon start datanode # 常规模式启动datanode
+    fi
+    # 如果本机需要启动SecondaryNameNode则启动
+    if [[ "$SECONDARY_DN_NODE" == $(hostname) ]]; then
+        echo "Starting SecondaryNameNode on $(hostname)..."
+        hdfs --daemon start secondarynamenode
     fi
 fi
 

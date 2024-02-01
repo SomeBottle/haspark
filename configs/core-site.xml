@@ -2,8 +2,17 @@
 <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
 <configuration>
   <property>
-    <!--HDFS端口，主节点主机名shmain-->
+    <!--HDFS默认地址-->
     <name>fs.defaultFS</name>
-    <value>hdfs://%%HADOOP_MASTER%%:9000</value>
+    <value>hdfs://%%HDFS_DEF_HOST%%</value>
   </property>
+
+  @#HA_CONF_START#@
+  <!-- @#HA_CONF_START#@ 和 @#HA_CONF_END#@ 包裹的是高可用配置-->
+  <property>
+    <!--Zookeeper节点地址-->
+    <name>ha.zookeeper.quorum</name>
+    <value>%%ZOOKEEPER_NODES%%</value>
+  </property>
+  @#HA_CONF_END#@
 </configuration>

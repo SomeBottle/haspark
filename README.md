@@ -23,17 +23,28 @@
 
 在`bitnami/spark`的基础上添加如下环境变量: 
 
+### Hadoop普通分布式
+
 | 名称 | 说明 | 默认值 |
 | --- | --- | --- |
 | `HADOOP_MASTER` | HDFS NameNode所在主节点主机名 | 无 |
 | `HADOOP_WORKERS` | **空格分隔**的HDFS从节点主机名列表 | 无 |
 | `DN_ON_MASTER` | 在HDFS NameNode所在节点上是否启动DataNode | `"false"` |
+| `SECONDARY_DN_NODE` | Secondary Namenode所在结点的主机名，留空则不启动 | 无 |
 | `HDFS_REPLICATION` | HDFS副本数 | `2` |
 | `YARN_RM_NODE` | Yarn ResourceManager所在节点 | 无 |
 | `NM_WITH_RM` | 在ResourceManager所在节点是否启动NodeManager | `"false"` |
 | `NM_WITH_RM` | 在ResourceManager所在节点是否启动NodeManager | `"false"` |
 | `HDFS_LAUNCH_ON_STARTUP` | 是否在容器启动时自动启动HDFS各个节点的守护进程 | `"false"` |  
 | `YARN_LAUNCH_ON_STARTUP` | 是否在容器启动时自动启动Yarn各个节点的守护进程 | `"false"` |  
+
+### Hadoop高可用（HA）分布式
+
+| 名称 | 说明 | 默认值 |
+| --- | --- | --- |
+|`HA_HDFS_NAMESERVICE`|HDFS高可用集群的服务名（逻辑地址）| `"hacluster"` |
+|`NAMENODE_NODES`|需要启动NameNode的节点的主机名列表（空格分隔）| 空 |
+|`JOURNALNODE_NODES`|需要启动JournalNode的节点的主机名列表（空格分隔）| 空 |
 
 ## 只读环境变量
 
@@ -51,6 +62,7 @@
 |`HADOOP_LOG_DIR` | Hadoop日志目录 | 
 |`SPARK_CONF_DIR` | Spark配置文件目录 |
 |`SH_HOSTS` | 集群中所有节点的主机名 |
+
 
 
 ## 提供的脚本
@@ -199,8 +211,37 @@ Hadoop集群停止脚本：
 /opt/stop-hadoop.sh  
 ```
 
+## 容器内常用端口
 
+以下是本镜像创建的容器内部常用端口，你可以选择性地在`docker-compose.yml`中将一些端口映射出来。
+
+> 注：本镜像采用的是Hadoop集群默认端口。
+
+| 端口 | 服务 |
+| --- | --- |
+| `9870` | Namenode WebUI（http） |
+| `8088` | Yarn ResourceManager WebUI（http） |
+| `8042` | Yarn NodeManager WebUI（http） |
+| `8020` | `fs.defaultFS`绑定到的端口；Namenode的RPC端口 |
+| `8485` | JournalNode的RPC端口 |
+
+更多默认端口可参考官方文档:  
+
+* https://hadoop.apache.org/docs/r3.3.6/hadoop-project-dist/hadoop-common/core-default.xml  
+* https://hadoop.apache.org/docs/r3.3.6/hadoop-project-dist/hadoop-hdfs/hdfs-default.xml
+* https://hadoop.apache.org/docs/r3.3.6/hadoop-mapreduce-client/hadoop-mapreduce-client-core/mapred-default.xml
+* https://hadoop.apache.org/docs/r3.3.6/hadoop-yarn/hadoop-yarn-common/yarn-default.xml
+
+## 数据存储目录
+
+### HDFS
+
+* NameNode: `/root/hdfs/name`  
+* DataNode: `/root/hdfs/data`  
+* JournalNode: `/root/hdfs/journal`
 
 ## 感谢
 
 * [使用 Docker 快速部署 Spark + Hadoop 大数据集群 - s1mple的文章 - 知乎](https://zhuanlan.zhihu.com/p/421375012)  
+* [Default Ports Used by Hadoop Services (HDFS, MapReduce, YARN)](https://kontext.tech/article/265/default-ports-used-by-hadoop-services-hdfs-mapreduce-yarn)  
+* [官方Hadoop HA配置文档](https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/HDFSHighAvailabilityWithQJM.html)  
