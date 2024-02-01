@@ -19,15 +19,16 @@ if [ -e $INIT_FLAG_FILE ]; then
     done
 fi
 
-# 启动SSH
+# 1. 启动SSH
 /etc/init.d/ssh start
 
-# 后台执行SSH KEY交换脚本，实现免密登录
+# 2. 后台执行SSH KEY交换脚本，实现免密登录
 nohup /opt/ssh_key_exchange.sh >exchange.log 2>&1 &
 
-# 初始化Zookeeper
+# 3. 先初始化Zookeeper
 /opt/zookeeper-setup.sh >zookeeper_setup.log 2>&1
 
+# 4. 再初始化Hadoop（因为初始化HA需要Zookeeper先初始化）
 if [[ -z "$HADOOP_LAUNCH_MODE" || "$HADOOP_LAUNCH_MODE" == "general" ]]; then
     # Hadoop初始化，如果HADOOP_LAUNCH_MODE为空，默认是general模式
     /opt/hadoop-general-setup.sh >hadoop_setup.log 2>&1
@@ -36,8 +37,8 @@ elif [[ "$HADOOP_LAUNCH_MODE" == "ha" ]]; then
     /opt/hadoop-ha-setup.sh >hadoop_setup.log 2>&1
 fi
 
-# 删除初始化标识，标识容器已经初始化
+# 5. 删除初始化标识，标识容器已经初始化
 rm -f $INIT_FLAG_FILE
 
-# 执行bitnami的entry脚本
+# 6. 执行bitnami的entry脚本
 source /opt/bitnami/scripts/spark/entrypoint.sh /opt/bitnami/scripts/spark/run.sh

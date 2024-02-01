@@ -5,9 +5,13 @@
 . /opt/utils.sh # 导入工具函数
 
 # 高可用需要等SSH密钥交换完毕再初始化
+# 因为需要启动Zookeeper，构建HA的sshfence，依赖于SSH通信
 while [ -e $TEMP_PASS_FILE ]; do
     sleep 3
 done
+
+# 启动Zookeeper
+(/opt/tools/zoo start)
 
 if [ -e $INIT_FLAG_FILE ]; then
     # 仅在容器初次启动时执行
@@ -55,4 +59,35 @@ if [ -e $INIT_FLAG_FILE ]; then
     journal_nodes=$(join_by "$JOURNALNODE_NODES" ';' ':8485')
     # 替换JournalNode地址列表
     sed -i "s/%%JOURNALNODE_NODES%%/$journal_nodes/g" $HADOOP_CONF_DIR/hdfs-site.xml
+
+    # ***********HDFS高可用初始化***********
+
+    # NAMENODE_NODES是NameNode所在的容器主机名列表
+    # 这里在首个主机名对应的容器上format，然后其他容器的namenode上进行元数据同步
+    namenodes_arr=($NAMENODE_NODES) # 转换为NameNodes数组
+
+    if [[ "${namenodes_arr[0]}" == "$(hostname)" ]]; then
+        # 如果本机是第一个NameNode
+        echo "Formatting HDFS..."
+        hdfs namenode -format
+    elif [[ "$NAMENODE_NODES" = *$(hostname)* ]]; then
+        # 如果本机不是首个NameNode，但也是NameNode，则同步元数据
+        echo "Syncing HDFS metadata..."
+        hdfs namenode -bootstrapStandby
+    fi
 fi
+
+# 如果NameNode在本机上需要启动
+if [[ "$NAMENODE_NODES" = *$(hostname)* ]]; then
+    echo "Starting NameNode on $(hostname)..."
+    hdfs --daemon start namenode # 守护模式启动namenode
+fi
+
+# 如果JournalNode在本机上需要启动
+if [[ "$JOURNALNODE_NODES" = *$(hostname)* ]]; then
+    echo "Starting JournalNode on $(hostname)..."
+    hdfs --daemon start journalnode # 守护模式启动journalnode
+fi
+
+# Todo: 和general一样能配置是否启动HDFS/YARN，然后另外还要配置ZKFC
+# 另外还要考虑DataNode和其他一些进程如何启动.

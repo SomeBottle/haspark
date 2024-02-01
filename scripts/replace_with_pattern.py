@@ -22,6 +22,7 @@ def replace_between_patterns(pattern_start, pattern_end, replacement, input_file
         pattern = re.compile(f'{re.escape(pattern_start)}.*?{re.escape(pattern_end)}', re.DOTALL)
         replaced_content = pattern.sub(replacement, content)
         file.seek(0)
+        file.truncate(0) # 截断文件，清空内容再写入
         file.write(replaced_content)
         
 

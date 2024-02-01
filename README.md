@@ -102,69 +102,7 @@ docker pull somebottle/haspark[:tag]
 <summary>展开查看</summary>  
 
 ```yaml
-version: '3'
-
-services:
-  haspark-main:
-    image: somebottle/haspark:3.1.0
-    hostname: shmain
-    environment:
-      - SH_HOSTS='shmain shworker1 shworker2'
-      - SPARK_MODE=master
-      - SPARK_RPC_AUTHENTICATION_ENABLED=no
-      - SPARK_RPC_ENCRYPTION_ENABLED=no
-      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
-      - SPARK_SSL_ENABLED=no
-      - HADOOP_MODE=master # 在主容器中其启动Hadoop集群
-    volumes:
-      - haspark-hdfs-name-data:/root/hdfs/name:copy # 映射docker卷到主容器的/root/hdfs/name，创建卷时复制镜像中初始化过的namenode数据
-      - ~/docker/spark/share:/opt/share # 三个容器映射到相同的共享目录
-    ports:
-      - '8080:8080'
-      - '4040:4040'
-      - '8088:8088'
-      - '8042:8042'
-      - '9870:9870'
-      - '19888:19888'
-  haspark-worker-1:
-    image: somebottle/haspark:3.1.0
-    hostname: shworker1
-    environment:
-      - SPARK_MODE=worker
-      - SPARK_MASTER_URL=spark://shmain:7077
-      - SPARK_WORKER_MEMORY=1G
-      - SPARK_WORKER_CORES=1
-      - SPARK_RPC_AUTHENTICATION_ENABLED=no
-      - SPARK_RPC_ENCRYPTION_ENABLED=no
-      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
-      - SPARK_SSL_ENABLED=no
-    volumes:
-      - ~/docker/spark/share:/opt/share
-      - haspark-hdfs-worker1-data:/root/hdfs/data # datanode数据
-    ports:
-      - '8081:8081'
-  haspark-worker-2:
-    image: somebottle/haspark:3.1.0
-    hostname: shworker2
-    environment:
-      - SPARK_MODE=worker
-      - SPARK_MASTER_URL=spark://shmain:7077
-      - SPARK_WORKER_MEMORY=1G
-      - SPARK_WORKER_CORES=1
-      - SPARK_RPC_AUTHENTICATION_ENABLED=no
-      - SPARK_RPC_ENCRYPTION_ENABLED=no
-      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
-      - SPARK_SSL_ENABLED=no
-    volumes:
-      - ~/docker/spark/share:/opt/share
-      - haspark-hdfs-worker2-data:/root/hdfs/data # datanode数据
-    ports:
-      - '8082:8081'
-
-volumes:
-  haspark-hdfs-name-data:
-  haspark-hdfs-worker1-data:
-  haspark-hdfs-worker2-data:
+待更新...
 ```
 
 </details>  

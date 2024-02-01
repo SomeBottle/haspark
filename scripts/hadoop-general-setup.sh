@@ -36,7 +36,7 @@ if [[ "$HDFS_LAUNCH_ON_STARTUP" == "true" ]]; then
         # 如果配置了DN_ON_MASTER，则还在本节点启动DataNode
         if [[ "$DN_ON_MASTER" == "true" ]]; then
             echo "Starting DataNode on $(hostname)..."
-            hdfs --daemon start datanode # 常规模式启动datanode
+            hdfs --daemon start datanode # 守护模式启动datanode
         fi
     fi
     # 如果本机为工作结点，启动DataNode
