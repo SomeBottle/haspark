@@ -20,14 +20,12 @@ wait_for_java_process_on_specified_nodes QuorumPeerMain "$SH_HOSTS"
 if [[ "$HA_HDFS_SETUP_ON_STARTUP" == "true" ]]; then
 
     if [ -e $INIT_FLAG_FILE ]; then
-        echo "Initializing Hadoop High Availability (HA)."
+        echo "Initializing Hadoop High Availability (HA) - HDFS."
         # 仅在容器初次启动时执行 - Section 1
         # 修改配置文件
         # 需要用到高可用，这里把包裹占位符给去掉
         sed -i 's/@#HA_CONF_START#@//g; s/@#HA_CONF_END#@//g' $HADOOP_CONF_DIR/core-site.xml
         sed -i 's/@#HA_CONF_START#@//g; s/@#HA_CONF_END#@//g' $HADOOP_CONF_DIR/hdfs-site.xml
-        sed -i 's/@#HA_CONF_START#@//g; s/@#HA_CONF_END#@//g' $HADOOP_CONF_DIR/mapred-site.xml
-        sed -i 's/@#HA_CONF_START#@//g; s/@#HA_CONF_END#@//g' $HADOOP_CONF_DIR/yarn-site.xml
 
         # ***********修改core-site.xml***********
         # HDFS的NameNode的NameService名
@@ -36,11 +34,11 @@ if [[ "$HA_HDFS_SETUP_ON_STARTUP" == "true" ]]; then
         sed -i "s/%%HDFS_NAMESERVICE%%/$HA_HDFS_NAMESERVICE/g" $HADOOP_CONF_DIR/hdfs-site.xml
         # Zookeeper Quorum列表
         zookeeper_nodes=$(join_by "$SH_HOSTS" ',' ':2181')
-        sed -i "s/%%ZOOKEEPER_NODES%%/$zookeeper_nodes/g" $HADOOP_CONF_DIR/core-site.xml
+        sed -i "s/%%ZK_ADDRS%%/$zookeeper_nodes/g" $HADOOP_CONF_DIR/core-site.xml
 
         # ***********修改hdfs-site.xml***********
         # HDFS副本数
-        sed -i "s/%%HDFS_REPLICATION%%/$HDFS_REPLICATION/g" $HADOOP_CONF_DIR/hdfs-site.xml
+        sed -i "s/%%HDFS_REPLICATION%%/$HADOOP_HDFS_REPLICATION/g" $HADOOP_CONF_DIR/hdfs-site.xml
         # HDFS的NameNode的NameService名
         sed -i "s/%%HDFS_NAMESERVICE%%/$HA_HDFS_NAMESERVICE/g" $HADOOP_CONF_DIR/hdfs-site.xml
         # 抽取重复配置字符串
@@ -54,7 +52,7 @@ if [[ "$HA_HDFS_SETUP_ON_STARTUP" == "true" ]]; then
         namenodes_name_list=""
         # 待输出的生成配置
         generated_namenodes_conf=""
-        for host in $HA_NAMENODE_NODES; do
+        for host in $HA_NAMENODE_HOSTS; do
             # namenode逻辑名为nn0,nn1,nn2,...
             namenodes_name_list+="nn$namenode_id "
             # 生成每个namenode逻辑名对应的主机名配置
@@ -73,21 +71,21 @@ if [[ "$HA_HDFS_SETUP_ON_STARTUP" == "true" ]]; then
         # 处理完成后把HA_REPEAT_XXX_START/END部分用生成的配置替换
         replace_repeat_conf 'NAMENODE' "$generated_namenodes_conf" $HADOOP_CONF_DIR/hdfs-site.xml
         # 生成JournalNode地址列表
-        journal_nodes=$(join_by "$HA_JOURNALNODE_NODES" ';' ':8485')
+        journal_nodes=$(join_by "$HA_JOURNALNODE_HOSTS" ';' ':8485')
         # 替换JournalNode地址列表
-        sed -i "s/%%HA_JOURNALNODE_NODES%%/$journal_nodes/g" $HADOOP_CONF_DIR/hdfs-site.xml
+        sed -i "s/%%HDFS_JOURNALNODE_ADDRS%%/$journal_nodes/g" $HADOOP_CONF_DIR/hdfs-site.xml
     fi
 
     # ################# 容器每次启动都执行的部分 SECTION1-START #################
 
     # 如果JournalNode在本机上需要启动
-    if [[ "$HA_JOURNALNODE_NODES" = *$(hostname)* ]]; then
+    if [[ "$HA_JOURNALNODE_HOSTS" = *$(hostname)* ]]; then
         echo "Starting JournalNode on $(hostname)..."
         hdfs --daemon start journalnode # 守护模式启动journalnode
     fi
 
     # 协调: 等待所有结点的JournalNode启动
-    wait_for_java_process_on_specified_nodes JournalNode "$HA_JOURNALNODE_NODES"
+    wait_for_java_process_on_specified_nodes JournalNode "$HA_JOURNALNODE_HOSTS"
 
     # ################# 容器每次启动都执行的部分 SECTION1-END #################
 
@@ -96,9 +94,9 @@ if [[ "$HA_HDFS_SETUP_ON_STARTUP" == "true" ]]; then
 
         # ***********HDFS高可用初始化***********
 
-        # HA_NAMENODE_NODES是NameNode所在的容器主机名列表
+        # HA_NAMENODE_HOSTS是NameNode所在的容器主机名列表
         # 这里在首个主机名对应的容器上format，然后其他容器的namenode上进行元数据同步
-        namenodes_arr=($HA_NAMENODE_NODES) # 转换为NameNodes数组
+        namenodes_arr=($HA_NAMENODE_HOSTS) # 转换为NameNodes数组
 
         if [[ "${namenodes_arr[0]}" == "$(hostname)" ]]; then
             # 如果本机是第一个NameNode
@@ -107,7 +105,7 @@ if [[ "$HA_HDFS_SETUP_ON_STARTUP" == "true" ]]; then
             hdfs namenode -format
             echo "Formatting ZKFC..."
             hdfs zkfc -formatZK
-        elif [[ "$HA_NAMENODE_NODES" = *$(hostname)* ]]; then
+        elif [[ "$HA_NAMENODE_HOSTS" = *$(hostname)* ]]; then
             # 如果本机不是首个NameNode，但也是NameNode，则同步元数据
             echo "Syncing HDFS metadata..."
             hdfs namenode -bootstrapStandby
@@ -117,7 +115,7 @@ if [[ "$HA_HDFS_SETUP_ON_STARTUP" == "true" ]]; then
     # ################# 容器每次启动都执行的部分 SECTION2-START #################
 
     # 如果NameNode在本机上需要启动
-    if [[ "$HA_NAMENODE_NODES" = *$(hostname)* ]]; then
+    if [[ "$HA_NAMENODE_HOSTS" = *$(hostname)* ]]; then
         echo "Starting NameNode on $(hostname)..."
         hdfs --daemon start namenode # 守护模式启动namenode
         echo "Starting ZKFC on $(hostname)..."
@@ -125,11 +123,31 @@ if [[ "$HA_HDFS_SETUP_ON_STARTUP" == "true" ]]; then
     fi
 
     # 如果DataNode需要在本机上启动
-    if [[ "$HA_DATANODE_NODES" = *$(hostname)* ]]; then
+    if [[ "$HA_DATANODE_HOSTS" = *$(hostname)* ]]; then
         echo "Starting DataNode on $(hostname)..."
         hdfs --daemon start datanode # 守护模式启动datanode
     fi
 
     # ################# 容器每次启动都执行的部分 SECTION2-END #################
 
+fi
+
+# **************************************************** 如果需要Yarn
+# 这部分主要是配置ResourceManager高可用
+if [[ "$HA_YARN_SETUP_ON_STARTUP" == "true" ]]; then
+    if [ -e $INIT_FLAG_FILE ]; then
+        echo "Initializing Hadoop High Availability (HA) - Yarn."
+        # 仅在容器初次启动时执行 - Section 1
+        # 修改配置文件
+        # 需要用到高可用，这里把包裹占位符给去掉
+        sed -i 's/@#HA_CONF_START#@//g; s/@#HA_CONF_END#@//g' $HADOOP_CONF_DIR/mapred-site.xml
+        sed -i 's/@#HA_CONF_START#@//g; s/@#HA_CONF_END#@//g' $HADOOP_CONF_DIR/yarn-site.xml
+        # ***********修改mapred-site.xml***********
+        # 分配给Map和Reduce任务的内存
+        sed -i "s/%%YARN_MAP_MEMORY_MB%%/$HADOOP_MAP_MEMORY_MB/g" $HADOOP_CONF_DIR/mapred-site.xml
+        sed -i "s/%%YARN_REDUCE_MEMORY_MB%%/$HADOOP_REDUCE_MEMORY_MB/g" $HADOOP_CONF_DIR/mapred-site.xml
+        # ***********修改yarn-site.xml***********
+        sed -i "s/%%YARN_CLUSTER_ID%%/$HA_YARN_CLUSTER_ID/g" $HADOOP_CONF_DIR/yarn-site.xml
+
+    fi
 fi

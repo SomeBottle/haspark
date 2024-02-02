@@ -36,20 +36,29 @@ docker pull somebottle/haspark
 
 在`bitnami/spark`的基础上添加如下环境变量: 
 
+### 通用配置
+
+| 名称 | 说明 | 默认值 |
+| --- | --- | --- |
+| `HADOOP_LAUNCH_MODE` | Hadoop部署模式 - `general`(普通分布式)或`ha`(高可用分布式) | `"general"` |
+| `HADOOP_HDFS_REPLICATION` | HDFS副本数 | `2` |
+| `HADOOP_MAP_MEMORY_MB` | 为每个Map任务分配的内存量 (以**MiB**为单位) | `1024` |
+| `HADOOP_REDUCE_MEMORY_MB` | 为每个Reduce任务分配的内存量 (以**MiB**为单位) | `1024` |
+
+
 ### Hadoop普通分布式
 
 | 名称 | 说明 | 默认值 |
 | --- | --- | --- |
-| `HADOOP_MASTER` | HDFS NameNode所在主节点主机名 | 无 |
-| `HADOOP_WORKERS` | **空格分隔**的HDFS从节点主机名列表 | 无 |
-| `DN_ON_MASTER` | 在HDFS NameNode所在节点上是否启动DataNode | `"false"` |
-| `SECONDARY_DN_NODE` | Secondary Namenode所在结点的主机名，留空则不启动 | 无 |
-| `HDFS_REPLICATION` | HDFS副本数 | `2` |
-| `YARN_RM_NODE` | Yarn ResourceManager所在节点 | 无 |
-| `NM_WITH_RM` | 在ResourceManager所在节点是否启动NodeManager | `"false"` |
-| `NM_WITH_RM` | 在ResourceManager所在节点是否启动NodeManager | `"false"` |
-| `HDFS_LAUNCH_ON_STARTUP` | 是否在容器启动时自动启动HDFS各个节点的守护进程 | `"false"` |  
-| `YARN_LAUNCH_ON_STARTUP` | 是否在容器启动时自动启动Yarn各个节点的守护进程 | `"false"` |  
+| `GN_NAMENODE_HOST` | HDFS NameNode所在主节点主机名 | 无 |
+| `GN_HADOOP_WORKER_HOSTS` | **空格分隔**的HDFS从节点主机名列表 | 无 |
+| `GN_DATANODE_ON_MASTER` | 在HDFS NameNode所在节点上是否启动DataNode | `"false"` |
+| `GN_SECONDARY_DATANODE_HOST` | Secondary Namenode所在结点的主机名，留空则不启动 | 无 |
+| `GN_RESOURCEMANAGER_HOST` | Yarn ResourceManager所在节点 | 无 |
+| `GN_NODEMANAGER_WITH_RESOURCEMANAGER` | 在ResourceManager所在节点是否启动NodeManager | `"false"` |
+| `GN_NODEMANAGER_WITH_RESOURCEMANAGER` | 在ResourceManager所在节点是否启动NodeManager | `"false"` |
+| `GN_HDFS_SETUP_ON_STARTUP` | 是否在容器启动时自动启动HDFS各个节点的守护进程 | `"false"` |  
+| `GN_YARN_SETUP_ON_STARTUP` | 是否在容器启动时自动启动Yarn各个节点的守护进程 | `"false"` |  
 
 ### Hadoop高可用（HA）分布式
 
@@ -57,9 +66,10 @@ docker pull somebottle/haspark
 | --- | --- | --- |
 |`HA_HDFS_NAMESERVICE`|HDFS高可用集群的服务名（逻辑地址）| `"hacluster"` |
 |`HA_HDFS_SETUP_ON_STARTUP`| 是否在容器启动时自动初始化并启动HDFS | `"false"` |  
-|`HA_NAMENODE_NODES`|需要启动NameNode的节点的主机名列表（空格分隔）| 空 |
-|`HA_JOURNALNODE_NODES`|需要启动JournalNode的节点的主机名列表（空格分隔）| 空 |
-|`HA_DATANODE_NODES`|需要启动DataNode的节点的主机名列表（空格分隔）| 空 |
+|`HA_NAMENODE_HOSTS`|需要启动NameNode的节点的主机名列表（空格分隔）| 空 |
+|`HA_JOURNALNODE_HOSTS`|需要启动JournalNode的节点的主机名列表（空格分隔）| 空 |
+|`HA_DATANODE_HOSTS`|需要启动DataNode的节点的主机名列表（空格分隔）| 空 |
+|`HA_YARN_SETUP_ON_STARTUP`| 是否在容器启动时自动初始化并启动YARN | `"false"` |  
 
 ## 只读环境变量
 
@@ -175,6 +185,7 @@ Hadoop集群停止脚本：
 | `9870` | Namenode WebUI（http） |
 | `8088` | Yarn ResourceManager WebUI（http） |
 | `8042` | Yarn NodeManager WebUI（http） |
+| `19888` | Yarn JobHistory WebUI（http） |
 | `8020` | `fs.defaultFS`绑定到的端口；Namenode的RPC端口 |
 | `8485` | JournalNode的RPC端口 |
 | `2181` | Zookeeper对客户端开放的端口 |
@@ -203,7 +214,9 @@ Hadoop集群停止脚本：
 
 * [Default Ports Used by Hadoop Services (HDFS, MapReduce, YARN)](https://kontext.tech/article/265/default-ports-used-by-hadoop-services-hdfs-mapreduce-yarn)  
 
-* [官方Hadoop HA配置文档](https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/HDFSHighAvailabilityWithQJM.html)  
+* [官方Hadoop HDFS HA配置文档](https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/HDFSHighAvailabilityWithQJM.html)  
+* 
+* [官方Hadoop ResourceManager HA配置文档](https://hadoop.apache.org/docs/stable/hadoop-yarn/hadoop-yarn-site/ResourceManagerHA.html)  
 
 * [Hadoop 之 高可用不自动切换(ssh密钥无效 Caused by: com.jcraft.jsch.JSchException: invalid privatekey )](https://www.cnblogs.com/simple-li/p/14654812.html)  
 

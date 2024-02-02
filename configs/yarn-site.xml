@@ -11,11 +11,30 @@
     </property>
     <property>
         <name>yarn.resourcemanager.hostname</name>
-        <value>%%YARN_RM_NODE%%</value>
+        <value>%%YARN_RESOURCEMANAGER_HOST%%</value>
     </property>
     <property>
         <name>yarn.nodemanager.env-whitelist</name>
         <value>
             JAVA_HOME,HADOOP_COMMON_HOME,HADOOP_HDFS_HOME,HADOOP_CONF_DIR,CLASSPATH_PREPEND_DISTCACHE,HADOOP_YARN_HOME,HADOOP_MAPRED_HOME</value>
     </property>
+
+    @#HA_CONF_START#@
+    <!-- @#HA_CONF_START#@ 和 @#HA_CONF_END#@ 包裹的是高可用配置-->
+    <property>
+        <name>yarn.resourcemanager.ha.enabled</name>
+        <value>true</value>
+        <description>RM高可用，启动！</description>
+    </property>
+    <property>
+        <name>yarn.resourcemanager.cluster-id</name>
+        <value>%%YARN_CLUSTER_ID%%</value>
+        <description>Yarn集群ID</description>
+    </property>
+    <property>
+        <name>yarn.resourcemanager.ha.rm-ids</name>
+        <value>%%YARN_RESOURCEMANAGER_NAMES%%</value>
+        <description>ResourceManager逻辑名，逗号分隔多个</description>
+    </property>
+    @#HA_CONF_END#@
 </configuration>

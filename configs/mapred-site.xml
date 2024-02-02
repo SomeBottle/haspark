@@ -18,8 +18,20 @@
         <name>mapreduce.reduce.env</name>
         <value>HADOOP_MAPRED_HOME=/opt/hadoop</value>
     </property>
-    <property> 
-      <name>mapreduce.application.classpath</name>
-      <value>$HADOOP_MAPRED_HOME/share/hadoop/mapreduce/*,$HADOOP_MAPRED_HOME/share/hadoop/mapreduce/lib/*,$HADOOP_MAPRED_HOME/share/hadoop/common/*,$HADOOP_MAPRED_HOME/share/hadoop/common/lib/*,$HADOOP_MAPRED_HOME/share/hadoop/yarn/*,$HADOOP_MAPRED_HOME/share/hadoop/yarn/lib/*,$HADOOP_MAPRED_HOME/share/hadoop/hdfs/*,$HADOOP_MAPRED_HOME/share/hadoop/hdfs/lib/*</value>
+    <property>
+        <name>mapreduce.application.classpath</name>
+        <value>
+            $HADOOP_MAPRED_HOME/share/hadoop/mapreduce/*,$HADOOP_MAPRED_HOME/share/hadoop/mapreduce/lib/*,$HADOOP_MAPRED_HOME/share/hadoop/common/*,$HADOOP_MAPRED_HOME/share/hadoop/common/lib/*,$HADOOP_MAPRED_HOME/share/hadoop/yarn/*,$HADOOP_MAPRED_HOME/share/hadoop/yarn/lib/*,$HADOOP_MAPRED_HOME/share/hadoop/hdfs/*,$HADOOP_MAPRED_HOME/share/hadoop/hdfs/lib/*</value>
     </property>
+    <property>
+        <name>mapreduce.map.memory.mb</name>
+        <value>%%YARN_MAP_MEMORY_MB%%</value>
+        <description>每个Map Task的工作内存</description>
+    </property>
+    <property>
+        <name>mapreduce.reduce.memory.mb</name>
+        <value>%%YARN_REDUCE_MEMORY_MB%%</value>
+        <description>每个Reduce Task工作内存</description>
+    </property>
+
 </configuration>

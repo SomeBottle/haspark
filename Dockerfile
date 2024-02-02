@@ -30,9 +30,9 @@ ENV TEMP_PASS_FILE="/root/temp.pass"
 # 用户.ssh配置目录
 ENV USR_SSH_CONF_DIR="/root/.ssh"
 # Hadoop HDFS是否随容器一并启动
-ENV HDFS_LAUNCH_ON_STARTUP="true"
+ENV GN_HDFS_SETUP_ON_STARTUP="true"
 # Hadoop YARN是否随容器一并启动
-ENV YARN_LAUNCH_ON_STARTUP="true"
+ENV GN_YARN_SETUP_ON_STARTUP="true"
 # 容器初次启动标识文件
 ENV INIT_FLAG_FILE="/root/init_flag"
 # 高可用-HDFS Nameservice

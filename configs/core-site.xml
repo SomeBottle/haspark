@@ -24,7 +24,7 @@
   <property>
     <!--Zookeeper节点地址-->
     <name>ha.zookeeper.quorum</name>
-    <value>%%ZOOKEEPER_NODES%%</value>
+    <value>%%ZK_ADDRS%%</value>
   </property>
   @#HA_CONF_END#@
 </configuration>
