@@ -80,9 +80,20 @@
         <description>失败后自动转移的实现方式</description>
     </property>
     <property>
+        <!--
+            至于为什么这里先采用sshfence, 再采用shell(true)：
+                1. 如果目前active的NameNode只是进程死了，sshfence可以解决故障转移。  
+                2. 但是如果这个NameNode所在的机器直接就熄火了，sshfence连不上这台机器，无法进行故障转移。这种情况ZKFC会转向shell(true)这个方法，以保证现存的机器的NameNode能切换至active
+            参考文章
+                * https://cornerhadoop.blogspot.com/2017/01/fencing-method-for-zk-based-ha-in-hadoop.htm
+                * https://community.cloudera.com/t5/Support-Questions/What-s-purpose-of-shell-bin-true-in-HDFS-HA-fencer/m-p/152515/highlight/true#M114982
+        -->
         <name>dfs.ha.fencing.methods</name>
-        <value>sshfence</value>
-        <description>防止脑裂</description>
+        <value>
+            sshfence 
+            shell(/bin/true)
+        </value>
+        <description>隔离机制，防止脑裂</description>
     </property>
     <property>
         <name>dfs.ha.fencing.ssh.private-key-files</name>

@@ -4,8 +4,6 @@
 
 . /opt/utils.sh # 导入工具函数
 
-# ############### 先启动JournalNode ###############
-
 # 高可用需要等SSH密钥交换完毕再初始化
 # 构建HA的sshfence，依赖于SSH通信
 while [ -e $TEMP_PASS_FILE ]; do
@@ -77,6 +75,10 @@ if [ -e $INIT_FLAG_FILE ]; then
     sed -i "s/%%JOURNALNODE_NODES%%/$journal_nodes/g" $HADOOP_CONF_DIR/hdfs-site.xml
 fi
 
+
+
+
+
 # ################# 容器每次启动都执行的部分 SECTION1-START #################
 
 # 如果JournalNode在本机上需要启动
@@ -89,6 +91,9 @@ fi
 wait_for_java_process_on_specified_nodes JournalNode "$JOURNALNODE_NODES"
 
 # ################# 容器每次启动都执行的部分 SECTION1-END #################
+
+
+
 
 if [ -e $INIT_FLAG_FILE ]; then
     # 仅在容器初次启动时执行 - Section 2
@@ -112,6 +117,10 @@ if [ -e $INIT_FLAG_FILE ]; then
         hdfs namenode -bootstrapStandby
     fi
 fi
+
+
+
+
 
 # ################# 容器每次启动都执行的部分 SECTION2-START #################
 
