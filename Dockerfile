@@ -50,7 +50,7 @@ RUN touch $INIT_FLAG_FILE
 # 先生成一个临时SSH密码，用于首次启动时交换ssh密钥
 RUN echo $(openssl rand -base64 32) > $TEMP_PASS_FILE
 # 修改root用户的密码
-RUN echo -e "$(cat $TEMP_PASS_FILE)\n$(cat $TEMP_PASS_FILE)" | passwd root
+RUN echo -e "$(cat $TEMP_PASS_FILE)\n$(cat $TEMP_PASS_FILE)" | passwd root 
 
 
 # 若.ssh目录不存在则建立
@@ -63,7 +63,7 @@ COPY resources/sources.list /tmp/sources.list
 RUN mv /tmp/sources.list /etc/apt/sources.list
 
 # 更新apt-get以及openssh-server, wget, vim, sshpass
-RUN apt-get update && apt-get install -y openssh-server wget vim sshpass
+RUN apt-get update && apt-get install -y openssh-server wget vim sshpass lsof net-tools
 
 # 切换到安装目录/opt
 WORKDIR /opt
@@ -128,6 +128,9 @@ COPY tools/* /opt/tools/
 # 给所有工具脚本加上可执行权限
 RUN chmod +x /opt/tools/*
 
+# 替换JSch库
+COPY lib/jsch-0.2.16.jar /opt/hadoop/share/hadoop/hdfs/lib/jsch-0.1.55.jar
+COPY lib/jsch-0.2.16.jar /opt/hadoop/share/hadoop/common/lib/jsch-0.1.55.jar
 
 # 容器启动待执行的脚本
 ENTRYPOINT [ "/opt/entry.sh" ]

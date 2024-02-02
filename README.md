@@ -160,6 +160,7 @@ Hadoop集群停止脚本：
 | `9870` | Namenode WebUI（http） |
 | `8088` | Yarn ResourceManager WebUI（http） |
 | `8042` | Yarn NodeManager WebUI（http） |
+| `2181` | Zookeeper对客户端开放的端口 |
 | `8020` | `fs.defaultFS`绑定到的端口；Namenode的RPC端口 |
 | `8485` | JournalNode的RPC端口 |
 
@@ -178,8 +179,13 @@ Hadoop集群停止脚本：
 * DataNode: `/root/hdfs/data`  
 * JournalNode: `/root/hdfs/journal`
 
+### 日志
+* Hadoop的日志位于`/var/log/hadoop`目录。
+
 ## 感谢
 
 * [使用 Docker 快速部署 Spark + Hadoop 大数据集群 - s1mple的文章 - 知乎](https://zhuanlan.zhihu.com/p/421375012)  
 * [Default Ports Used by Hadoop Services (HDFS, MapReduce, YARN)](https://kontext.tech/article/265/default-ports-used-by-hadoop-services-hdfs-mapreduce-yarn)  
 * [官方Hadoop HA配置文档](https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/HDFSHighAvailabilityWithQJM.html)  
+
+* [Hadoop 之 高可用不自动切换(ssh密钥无效 Caused by: com.jcraft.jsch.JSchException: invalid privatekey )](https://www.cnblogs.com/simple-li/p/14654812.html)  

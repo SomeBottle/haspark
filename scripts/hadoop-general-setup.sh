@@ -4,6 +4,7 @@
 
 if [ -e $INIT_FLAG_FILE ]; then
     # 仅在容器初次启动时执行
+    echo "Initializing Hadoop (General)."
     # 修改配置文件
     # 因为不是高可用模式，剔除配置文件中的高可用配置
     sed -i '/@#HA_CONF_START#@/,/@#HA_CONF_END#@/d' $HADOOP_CONF_DIR/core-site.xml

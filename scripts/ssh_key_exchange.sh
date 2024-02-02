@@ -12,7 +12,9 @@ if [ ! -e $TEMP_PASS_FILE ]; then
 fi
 
 # 先建立RSA密钥对
-ssh-keygen -t rsa -f $USR_SSH_CONF_DIR/id_rsa -N ''
+# 这里-m指定生成pem格式的密钥，因为Hadoop高可用的JSch不支持OPENSSL格式
+# 因为最新版的ssh默认生成的是openssl格式了
+ssh-keygen -m PEM -t rsa -f $USR_SSH_CONF_DIR/id_rsa -N ''
 
 retryCnt=0
 # 将公钥复制到其他容器
@@ -24,9 +26,9 @@ for i in $SH_HOSTS; do
             # 分发公钥
             # 然后在其他容器放置标记文件，表示已经分发过公钥
             # 注意一定要配置.ssh/config中的StrictHostKeyChecking，不然首次连接会有警告，导致sshpass找不到prompt
-            sshpass -p $(cat $TEMP_PASS_FILE) ssh-copy-id -i $USR_SSH_CONF_DIR/id_rsa.pub root@$i && \
-            sshpass -p $(cat $TEMP_PASS_FILE) ssh root@$i "touch $FLAG_DIR/$(hostname)" && \
-            echo "Key sent: $(hostname) -> $i"
+            sshpass -p $(cat $TEMP_PASS_FILE) ssh-copy-id -i $USR_SSH_CONF_DIR/id_rsa.pub root@$i &&
+                sshpass -p $(cat $TEMP_PASS_FILE) ssh root@$i "touch $FLAG_DIR/$(hostname)" &&
+                echo "Key sent: $(hostname) -> $i"
             if [ $? -eq 0 ]; then
                 break
             else
@@ -44,7 +46,7 @@ for i in $SH_HOSTS; do
 done
 
 # 本机公钥也加入authorized_keys，Hadoop启动时还要和本机进行ssh连接
-cat $USR_SSH_CONF_DIR/id_rsa.pub >> $USR_SSH_CONF_DIR/authorized_keys
+cat $USR_SSH_CONF_DIR/id_rsa.pub >>$USR_SSH_CONF_DIR/authorized_keys
 # 把本机先标记上
 touch $FLAG_DIR/$(hostname)
 

@@ -7,6 +7,18 @@
     <value>hdfs://%%HDFS_DEF_HOST%%</value>
   </property>
 
+  <!--ipc连接重试配置-->
+  <property>
+    <name>ipc.client.connect.max.retries</name>
+    <value>20</value>
+    <description>Indicates the number of retries a client will make to establish a server connection.</description>
+  </property>
+  <property>
+      <name>ipc.client.connect.retry.interval</name>
+      <value>5000</value>
+      <description>Indicates the number of milliseconds a client will wait for before retrying to establish a server connection.</description>
+  </property>
+
   @#HA_CONF_START#@
   <!-- @#HA_CONF_START#@ 和 @#HA_CONF_END#@ 包裹的是高可用配置-->
   <property>
