@@ -60,7 +60,7 @@
 
     <property>
         <name>dfs.namenode.shared.edits.dir</name>
-        <value>qjournal://%%JOURNALNODE_NODES%%/%%HDFS_NAMESERVICE%%</value>
+        <value>qjournal://%%HA_JOURNALNODE_NODES%%/%%HDFS_NAMESERVICE%%</value>
         <description>指定NameNode的edits元数据的共享存储位置（JournalNode RPC地址列表，逗号分隔）</description>
     </property>
     <property>

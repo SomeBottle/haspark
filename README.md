@@ -2,16 +2,29 @@
 
 本镜像基于`bitnami/spark:3.5.0`镜像，系统为`Debian 11`，执行用户为`root`。  
 
-面向本地集群环境测试，即**伪分布式**，应该也可以上线到真实容器集群中搭建成分布式（尚未测试）。
-
-* 本镜像配置完成，用docker compose上线容器后，能**自动交换SSH公钥实现节点间SSH免密登录**。
-* 本镜像在**WSL**上测试完成。
 * [Docker hub](https://hub.docker.com/r/somebottle/haspark)  
 
-## 版本
+```bash
+docker pull somebottle/haspark
+```
+
+面向本地集群环境测试，即**伪分布式**，应该也可以上线到真实容器集群中搭建成分布式（尚未测试）。  
+
+设计理念是**简单配置，快速上线测试**，因此配置项较少。  
+
+如果有增加配置项的需要，欢迎发[Issue](https://github.com/SomeBottle/haspark/issues)亦或者开[Pull request](https://github.com/SomeBottle/haspark/pulls)！  
+
+## 关于本镜像
+
+* 本镜像配置完成，用docker compose上线容器后，能**自动交换SSH公钥实现节点间SSH免密登录**。
+* 多节点进程启动同步机制：本镜像依赖于SSH，在进行多个容器上Hadoop组件部署的时候会等待各节点相应进程全启动完毕再进入下一步。
+* 本镜像在**WSL**上测试完成。
+
+## 软件版本
 
 * Hadoop `3.3.6`
 * Spark `3.5.0`  
+* Zookeeper `3.9.1`
 
 ## 默认节点分配
 
@@ -43,8 +56,10 @@
 | 名称 | 说明 | 默认值 |
 | --- | --- | --- |
 |`HA_HDFS_NAMESERVICE`|HDFS高可用集群的服务名（逻辑地址）| `"hacluster"` |
-|`NAMENODE_NODES`|需要启动NameNode的节点的主机名列表（空格分隔）| 空 |
-|`JOURNALNODE_NODES`|需要启动JournalNode的节点的主机名列表（空格分隔）| 空 |
+|`HA_HDFS_SETUP_ON_STARTUP`| 是否在容器启动时自动初始化并启动HDFS | `"false"` |  
+|`HA_NAMENODE_NODES`|需要启动NameNode的节点的主机名列表（空格分隔）| 空 |
+|`HA_JOURNALNODE_NODES`|需要启动JournalNode的节点的主机名列表（空格分隔）| 空 |
+|`HA_DATANODE_NODES`|需要启动DataNode的节点的主机名列表（空格分隔）| 空 |
 
 ## 只读环境变量
 
@@ -151,18 +166,18 @@ Hadoop集群停止脚本：
 
 ## 容器内常用端口
 
-以下是本镜像创建的容器内部常用端口，你可以选择性地在`docker-compose.yml`中将一些端口映射出来。
+以下是本镜像创建的容器内部常用端口，你可以选择性地在`docker-compose.yml`中将一些端口映射到宿主机。
 
-> 注：本镜像采用的是Hadoop集群默认端口。
+> 注：本镜像采用的大多是默认端口。
 
 | 端口 | 服务 |
 | --- | --- |
 | `9870` | Namenode WebUI（http） |
 | `8088` | Yarn ResourceManager WebUI（http） |
 | `8042` | Yarn NodeManager WebUI（http） |
-| `2181` | Zookeeper对客户端开放的端口 |
 | `8020` | `fs.defaultFS`绑定到的端口；Namenode的RPC端口 |
 | `8485` | JournalNode的RPC端口 |
+| `2181` | Zookeeper对客户端开放的端口 |
 
 更多默认端口可参考官方文档:  
 
@@ -185,7 +200,9 @@ Hadoop集群停止脚本：
 ## 感谢
 
 * [使用 Docker 快速部署 Spark + Hadoop 大数据集群 - s1mple的文章 - 知乎](https://zhuanlan.zhihu.com/p/421375012)  
+
 * [Default Ports Used by Hadoop Services (HDFS, MapReduce, YARN)](https://kontext.tech/article/265/default-ports-used-by-hadoop-services-hdfs-mapreduce-yarn)  
+
 * [官方Hadoop HA配置文档](https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/HDFSHighAvailabilityWithQJM.html)  
 
 * [Hadoop 之 高可用不自动切换(ssh密钥无效 Caused by: com.jcraft.jsch.JSchException: invalid privatekey )](https://www.cnblogs.com/simple-li/p/14654812.html)  
