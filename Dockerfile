@@ -62,8 +62,9 @@ RUN mkdir -p $USR_SSH_CONF_DIR/exchange_flags
 COPY resources/sources.list /tmp/sources.list
 RUN mv /tmp/sources.list /etc/apt/sources.list
 
-# 更新apt-get以及openssh-server, wget, vim, sshpass
-RUN apt-get update && apt-get install -y openssh-server wget vim sshpass lsof net-tools
+# 更新apt-get以及openssh-server, wget, vim, sshpass, net-tools, psmisc
+# psmisc包含Hadoop HA - sshfence所需的fuser工具
+RUN apt-get update && apt-get install -y openssh-server wget vim sshpass lsof net-tools psmisc
 
 # 切换到安装目录/opt
 WORKDIR /opt

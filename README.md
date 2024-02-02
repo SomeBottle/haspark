@@ -189,3 +189,7 @@ Hadoop集群停止脚本：
 * [官方Hadoop HA配置文档](https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/HDFSHighAvailabilityWithQJM.html)  
 
 * [Hadoop 之 高可用不自动切换(ssh密钥无效 Caused by: com.jcraft.jsch.JSchException: invalid privatekey )](https://www.cnblogs.com/simple-li/p/14654812.html)  
+
+* [Fencing Method for ZK based HA in Hadoop](https://cornerhadoop.blogspot.com/2017/01/fencing-method-for-zk-based-ha-in-hadoop.html)  
+  
+* [关于为什么fencing method还要加个无操作(`true`)的备选项](https://community.cloudera.com/t5/Support-Questions/What-s-purpose-of-shell-bin-true-in-HDFS-HA-fencer/m-p/152515/highlight/true#M114982)  
