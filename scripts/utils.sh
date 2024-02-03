@@ -50,7 +50,7 @@ function wait_for_java_process_on_specified_nodes() {
     for host in $2; do
         echo "Waiting for ${1} to start on ${host}..."
         # 在指定主机上先导入utils函数，然后等待指定Java进程启动
-        ssh root@$host "source /opt/utils.sh; wait_for_java_process $1"
+        ssh root@$host "source /opt/somebottle/haspark/utils.sh; wait_for_java_process $1"
         echo "${1} on ${host} has been started."
     done
 }
@@ -63,7 +63,7 @@ function extract_repeat_conf() {
     # 使用示例： extract_repeat_conf "NAMENODE" "hdfs-site.xml"
 
     # 用grep太鸡肋了，正好镜像中有python，用python咯
-    echo $(/opt/bitnami/python/bin/python /opt/extract_with_pattern.py "@#HA_REPEAT_${1}_START#@" "@#HA_REPEAT_${1}_END#@" "$2")
+    echo $(/opt/bitnami/python/bin/python /opt/somebottle/haspark/extract_with_pattern.py "@#HA_REPEAT_${1}_START#@" "@#HA_REPEAT_${1}_END#@" "$2")
     return $?
 }
 
@@ -75,6 +75,6 @@ function replace_repeat_conf() {
     # param3：配置文件路径
     # 使用示例： remove_repeat_conf "NAMENODE" "testconf" "hdfs-site.xml"
 
-    /opt/bitnami/python/bin/python /opt/replace_with_pattern.py "@#HA_REPEAT_${1}_START#@" "@#HA_REPEAT_${1}_END#@" "$2" "$3"
+    /opt/bitnami/python/bin/python /opt/somebottle/haspark/replace_with_pattern.py "@#HA_REPEAT_${1}_START#@" "@#HA_REPEAT_${1}_END#@" "$2" "$3"
     return $?
 }

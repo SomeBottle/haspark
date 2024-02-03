@@ -2,7 +2,7 @@
 
 # Hadoop高可用（HA）初始化/初启动脚本
 
-. /opt/utils.sh # 导入工具函数
+. /opt/somebottle/haspark/utils.sh # 导入工具函数
 
 # 高可用需要等SSH密钥交换完毕再初始化
 # 构建HA的sshfence，依赖于SSH通信

@@ -101,13 +101,13 @@ docker pull somebottle/haspark
 
 ### 1. 查询集群各容器的Java进程
 
-在命令行执行`jpsall`即可，脚本实际位于`/opt/tools/jpsall`。 
+在命令行执行`jpsall`即可，脚本实际位于`/opt/somebottle/haspark/tools/jpsall`。 
 
 ### 2. Zookeeper集群管理脚本
 
 命令行: `zoo <start|stop|status>`  
 
-脚本实际位于`/opt/tools/zoo`。
+脚本实际位于`/opt/somebottle/haspark/tools/zoo`。
 
 ## 容器部署
 
@@ -172,13 +172,13 @@ docker compose down -v # v代表volumes
 按理说容器启动后，**在完成免密登录配置后会自动执行**Hadoop集群启动脚本，如果没有的话你可以手动执行:  
 
 ```bash
-/opt/start-hadoop.sh  
+/opt/somebottle/haspark/start-hadoop.sh  
 ```
 
 Hadoop集群停止脚本：
 
 ```bash
-/opt/stop-hadoop.sh  
+/opt/somebottle/haspark/stop-hadoop.sh  
 ```
 
 ## 容器内常用端口
@@ -214,6 +214,7 @@ Hadoop集群停止脚本：
 
 ### 日志
 * Hadoop的日志位于`/opt/hadoop/logs`目录。
+* 容器启动时初始化的日志位于`/opt/somebottle/haspark/logs`目录，用于调试。
 
 ## 感谢
 

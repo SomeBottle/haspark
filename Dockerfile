@@ -24,7 +24,7 @@ ENV HADOOP_CONF_DIR="/opt/hadoop/etc/hadoop"
 # Hadoop日志目录
 ENV HADOOP_LOG_DIR="/opt/hadoop/logs"
 # 把Hadoop目录加入环境变量
-ENV PATH="$HADOOP_HOME/sbin:$HADOOP_HOME/bin:/opt/tools:$ZOOKEEPER_HOME/bin:$PATH"
+ENV PATH="$HADOOP_HOME/sbin:$HADOOP_HOME/bin:/opt/somebottle/haspark/tools:$ZOOKEEPER_HOME/bin:$PATH"
 # 临时密码文件路径加入环境变量
 ENV TEMP_PASS_FILE="/root/temp.pass"
 # 用户.ssh配置目录
@@ -65,6 +65,9 @@ RUN mv /tmp/sources.list /etc/apt/sources.list
 # 更新apt-get以及openssh-server, wget, vim, sshpass, net-tools, psmisc
 # psmisc包含Hadoop HA - sshfence所需的fuser工具
 RUN apt-get update && apt-get install -y openssh-server wget vim sshpass lsof net-tools psmisc
+
+# 建立haspark脚本目录
+RUN mkdir -p /opt/somebottle/haspark
 
 # 切换到安装目录/opt
 WORKDIR /opt
@@ -111,27 +114,27 @@ RUN chmod 600 $USR_SSH_CONF_DIR/config \
     && chmod 700 $USR_SSH_CONF_DIR
 
 # 拷贝启动脚本
-COPY scripts/* /opt/
+COPY scripts/* /opt/somebottle/haspark
 
 # 建立HDFS目录以及工具脚本目录
 RUN mkdir -p /root/hdfs/name \ 
     && mkdir -p /root/hdfs/data \
     && mkdir -p /root/hdfs/journal \
-    && mkdir -p /opt/tools 
+    && mkdir -p /opt/somebottle/haspark/tools
 
 # 增加执行权限
-RUN chmod +x /opt/*.sh \
+RUN chmod +x /opt/somebottle/haspark/*.sh \
     && chmod +x $HADOOP_HOME/sbin/*.sh \
     && chmod +x $ZOOKEEPER_HOME/bin/*.sh
 
 # 拷贝工具脚本
-COPY tools/* /opt/tools/
+COPY tools/* /opt/somebottle/haspark/tools/
 # 给所有工具脚本加上可执行权限
-RUN chmod +x /opt/tools/*
+RUN chmod +x /opt/somebottle/haspark/tools/*
 
 # 替换JSch库
 COPY lib/jsch-0.2.16.jar /opt/hadoop/share/hadoop/hdfs/lib/jsch-0.1.55.jar
 COPY lib/jsch-0.2.16.jar /opt/hadoop/share/hadoop/common/lib/jsch-0.1.55.jar
 
 # 容器启动待执行的脚本
-ENTRYPOINT [ "/opt/entry.sh" ]
+ENTRYPOINT [ "/opt/somebottle/haspark/entry.sh" ]
