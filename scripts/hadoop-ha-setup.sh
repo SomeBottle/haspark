@@ -193,13 +193,13 @@ if [[ "$HA_YARN_SETUP_ON_STARTUP" == "true" ]]; then
     # 如果ResourceManager在本机上需要启动
     if [[ "$HA_RESOURCEMANAGER_HOSTS" = *$(hostname)* ]]; then
         echo "Starting ResourceManager on $(hostname)..."
-        hdfs --daemon start resourcemanager # 守护模式启动RM
+        yarn --daemon start resourcemanager # 守护模式启动RM
     fi
 
     # 如果DataNode需要在本机上启动
     if [[ "$HA_NODEMANAGER_HOSTS" = *$(hostname)* ]]; then
         echo "Starting NodeManager on $(hostname)..."
-        hdfs --daemon start nodemanager # 守护模式启动NM
+        yarn --daemon start nodemanager # 守护模式启动NM
     fi
 
     # ################# 容器每次启动都执行的部分 SECTION-END #################
