@@ -1,8 +1,6 @@
 #!/bin/bash
 # 容器启动时执行的脚本
 
-# 得到集群中所有的主机名
-export SH_HOSTS="$GN_NAMENODE_HOST $GN_HADOOP_WORKER_HOSTS"
 # 修正家目录，bitnami不知道怎么想的，把文件系统根目录当家目录
 # 不修正的话，ssh-copy-id没法正常运作
 export HOME="$(eval echo ~$(whoami))"

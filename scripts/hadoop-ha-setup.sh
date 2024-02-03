@@ -16,7 +16,10 @@ $ZOOKEEPER_HOME/bin/zkServer.sh start
 # 协调: 等待所有结点的Zookeeper守护进程启动
 wait_for_java_process_on_specified_nodes QuorumPeerMain "$SH_HOSTS"
 
-# **************************************************** 如果需要HDFS
+# Zookeeper Quorum列表
+zookeeper_nodes=$(join_by "$SH_HOSTS" ',' ':2181')
+
+# **************************************************** 如果需要HDFS高可用
 if [[ "$HA_HDFS_SETUP_ON_STARTUP" == "true" ]]; then
 
     if [ -e $INIT_FLAG_FILE ]; then
@@ -32,8 +35,6 @@ if [[ "$HA_HDFS_SETUP_ON_STARTUP" == "true" ]]; then
         sed -i "s/%%HDFS_DEF_HOST%%/$HA_HDFS_NAMESERVICE/g" $HADOOP_CONF_DIR/core-site.xml
         # 修改hdfs-site.xml
         sed -i "s/%%HDFS_NAMESERVICE%%/$HA_HDFS_NAMESERVICE/g" $HADOOP_CONF_DIR/hdfs-site.xml
-        # Zookeeper Quorum列表
-        zookeeper_nodes=$(join_by "$SH_HOSTS" ',' ':2181')
         sed -i "s/%%ZK_ADDRS%%/$zookeeper_nodes/g" $HADOOP_CONF_DIR/core-site.xml
 
         # ***********修改hdfs-site.xml***********
@@ -132,12 +133,17 @@ if [[ "$HA_HDFS_SETUP_ON_STARTUP" == "true" ]]; then
 
 fi
 
+#
+#
+#
+#
+#
 # **************************************************** 如果需要Yarn
 # 这部分主要是配置ResourceManager高可用
 if [[ "$HA_YARN_SETUP_ON_STARTUP" == "true" ]]; then
     if [ -e $INIT_FLAG_FILE ]; then
+        # 仅在容器初次启动时执行
         echo "Initializing Hadoop High Availability (HA) - Yarn."
-        # 仅在容器初次启动时执行 - Section 1
         # 修改配置文件
         # 需要用到高可用，这里把包裹占位符给去掉
         sed -i 's/@#HA_CONF_START#@//g; s/@#HA_CONF_END#@//g' $HADOOP_CONF_DIR/mapred-site.xml
@@ -149,5 +155,53 @@ if [[ "$HA_YARN_SETUP_ON_STARTUP" == "true" ]]; then
         # ***********修改yarn-site.xml***********
         sed -i "s/%%YARN_CLUSTER_ID%%/$HA_YARN_CLUSTER_ID/g" $HADOOP_CONF_DIR/yarn-site.xml
 
+        # 抽取重复配置字符串
+        rm_repeat_conf=$(extract_repeat_conf 'RESOURCEMANAGER' $HADOOP_CONF_DIR/yarn-site.xml)
+        echo "========================="
+        echo "Extracted rm_repeat_conf:"
+        echo -e $rm_repeat_conf
+        echo "========================="
+        # 生成ResourceManager逻辑名，并进行配置
+        rm_id=0
+        rm_name_list=""
+        # 待输出的生成配置
+        generated_rm_conf=""
+        for host in $HA_RESOURCEMANAGER_HOSTS; do
+            # ResourceManager逻辑名为rm0,rm1,rm2,...
+            rm_name_list+="rm$rm_id "
+            # 生成每个ResourceManager逻辑名对应的主机名配置
+            generated_rm_conf+="$(echo $rm_repeat_conf | sed "s/%%RESOURCEMANAGER_NAME%%/rm${rm_id}/g" | sed "s/%%RESOURCEMANAGER_HOST%%/$host/g") \n"
+            # ResourceManager id递增
+            ((rm_id++))
+        done
+        # Namenode逻辑名列表转换为逗号分隔
+        rm_name_list=$(join_by "$rm_name_list" ',')
+        # 修改NameNode逻辑名列表
+        sed -i "s/%%YARN_RESOURCEMANAGER_NAMES%%/$rm_name_list/g" $HADOOP_CONF_DIR/yarn-site.xml
+        echo "========================="
+        echo "Generated ResourceManager config: "
+        echo -e $generated_rm_conf
+        echo "========================="
+        # 处理完成后把HA_REPEAT_XXX_START/END部分用生成的配置替换
+        replace_repeat_conf 'RESOURCEMANAGER' "$generated_rm_conf" $HADOOP_CONF_DIR/yarn-site.xml
+        # Zookeeper节点地址
+        sed -i "s/%%ZK_ADDRS%%/$zookeeper_nodes/g" $HADOOP_CONF_DIR/yarn-site.xml
     fi
+
+    # ################# 容器每次启动都执行的部分 SECTION-START #################
+
+    # 如果ResourceManager在本机上需要启动
+    if [[ "$HA_RESOURCEMANAGER_HOSTS" = *$(hostname)* ]]; then
+        echo "Starting ResourceManager on $(hostname)..."
+        hdfs --daemon start resourcemanager # 守护模式启动RM
+    fi
+
+    # 如果DataNode需要在本机上启动
+    if [[ "$HA_NODEMANAGER_HOSTS" = *$(hostname)* ]]; then
+        echo "Starting NodeManager on $(hostname)..."
+        hdfs --daemon start nodemanager # 守护模式启动NM
+    fi
+
+    # ################# 容器每次启动都执行的部分 SECTION-END #################
+
 fi

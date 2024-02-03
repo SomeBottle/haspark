@@ -36,7 +36,13 @@ docker pull somebottle/haspark
 
 在`bitnami/spark`的基础上添加如下环境变量: 
 
-### 通用配置
+### 首要配置
+
+| 名称 | 说明 | 默认值 |
+| --- | --- | --- |
+|`SH_HOSTS` | 集群中所有节点的主机名（**必填**），空格分隔 |
+
+### Hadoop通用配置
 
 | 名称 | 说明 | 默认值 |
 | --- | --- | --- |
@@ -70,6 +76,8 @@ docker pull somebottle/haspark
 |`HA_JOURNALNODE_HOSTS`|需要启动JournalNode的节点的主机名列表（空格分隔）| 空 |
 |`HA_DATANODE_HOSTS`|需要启动DataNode的节点的主机名列表（空格分隔）| 空 |
 |`HA_YARN_SETUP_ON_STARTUP`| 是否在容器启动时自动初始化并启动YARN | `"false"` |  
+|`HA_RESOURCEMANAGER_HOSTS`|需要启动ResourceManager的节点的主机名列表（空格分隔）| 空 |
+|`HA_NODEMANAGER_HOSTS`|需要启动NodeManager的节点的主机名列表（空格分隔）| 空 |
 
 ## 只读环境变量
 
@@ -86,7 +94,6 @@ docker pull somebottle/haspark
 |`HADOOP_CONF_DIR` | Hadoop配置文件目录 |
 |`HADOOP_LOG_DIR` | Hadoop日志目录 | 
 |`SPARK_CONF_DIR` | Spark配置文件目录 |
-|`SH_HOSTS` | 集群中所有节点的主机名 |
 
 
 
@@ -206,7 +213,7 @@ Hadoop集群停止脚本：
 * JournalNode: `/root/hdfs/journal`
 
 ### 日志
-* Hadoop的日志位于`/var/log/hadoop`目录。
+* Hadoop的日志位于`/opt/hadoop/logs`目录。
 
 ## 感谢
 
@@ -215,7 +222,7 @@ Hadoop集群停止脚本：
 * [Default Ports Used by Hadoop Services (HDFS, MapReduce, YARN)](https://kontext.tech/article/265/default-ports-used-by-hadoop-services-hdfs-mapreduce-yarn)  
 
 * [官方Hadoop HDFS HA配置文档](https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/HDFSHighAvailabilityWithQJM.html)  
-* 
+
 * [官方Hadoop ResourceManager HA配置文档](https://hadoop.apache.org/docs/stable/hadoop-yarn/hadoop-yarn-site/ResourceManagerHA.html)  
 
 * [Hadoop 之 高可用不自动切换(ssh密钥无效 Caused by: com.jcraft.jsch.JSchException: invalid privatekey )](https://www.cnblogs.com/simple-li/p/14654812.html)  

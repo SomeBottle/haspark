@@ -26,6 +26,12 @@
         <value>true</value>
         <description>RM高可用，启动！</description>
     </property>
+    <!--
+        RM高可用启动后，有两个配置默认为true:
+        yarn.resourcemanager.ha.automatic-failover.enabled
+        yarn.resourcemanager.ha.automatic-failover.embedded
+        其已经自动实现了故障转移。
+    -->
     <property>
         <name>yarn.resourcemanager.cluster-id</name>
         <value>%%YARN_CLUSTER_ID%%</value>
@@ -36,5 +42,41 @@
         <value>%%YARN_RESOURCEMANAGER_NAMES%%</value>
         <description>ResourceManager逻辑名，逗号分隔多个</description>
     </property>
+
+    @#HA_REPEAT_RESOURCEMANAGER_START#@
+    <property>
+        <name>yarn.resourcemanager.hostname.%%RESOURCEMANAGER_NAME%%</name>
+        <value>%%RESOURCEMANAGER_HOST%%</value>
+        <description>设置RM逻辑名对应的主机名</description>
+    </property>
+    <property>
+        <name>yarn.resourcemanager.webapp.address.%%RESOURCEMANAGER_NAME%%</name>
+        <value>%%RESOURCEMANAGER_HOST%%:8088</value>
+        <description>设置RM逻辑名绑定的Web UI地址</description>
+    </property>
+    @#HA_REPEAT_RESOURCEMANAGER_END#@
+
+    <property>
+        <name>yarn.resourcemanager.zk-address</name>
+        <value>%%ZK_ADDRS%%</value>
+        <description>指定Zookeeper集群各节点地址</description>
+    </property>
+    <property> 
+        <name>yarn.resourcemanager.recovery.enabled</name> 
+        <value>true</value> 
+        <description>启动自动恢复状态</description>
+    </property> 
+    <!--指定resourcemanager的状态信息存储在zookeeper集群--> 
+    <property>
+        <name>yarn.resourcemanager.store.class</name>  
+        <value>org.apache.hadoop.yarn.server.resourcemanager.recovery.ZKRMStateStore</value> 
+        <description>RM状态存储在Zookeeper中</description>
+    </property>
+
     @#HA_CONF_END#@
+
+    <property>
+        <name>yarn.scheduler.minimum-allocation-mb</name>
+        <value>256</value>
+    </property>
 </configuration>
