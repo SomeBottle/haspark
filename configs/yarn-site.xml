@@ -54,6 +54,18 @@
         <value>%%RESOURCEMANAGER_HOST%%:8088</value>
         <description>设置RM逻辑名绑定的Web UI地址</description>
     </property>
+    <property>
+        <name>yarn.resourcemanager.scheduler.address.%%RESOURCEMANAGER_NAME%%</name>
+        <value>%%RESOURCEMANAGER_HOST%%:8030</value>
+    </property>
+    <property>
+        <name>yarn.resourcemanager.address.%%RESOURCEMANAGER_NAME%%</name>
+        <value>%%RESOURCEMANAGER_HOST%%:8032</value>
+    </property>
+    <property>
+        <name>yarn.resourcemanager.resource-tracker.address.%%RESOURCEMANAGER_NAME%%</name>
+        <value>%%RESOURCEMANAGER_HOST%%:8031</value>
+    </property>
     @#HA_REPEAT_RESOURCEMANAGER_END#@
 
     <property>
@@ -78,5 +90,10 @@
     <property>
         <name>yarn.scheduler.minimum-allocation-mb</name>
         <value>256</value>
+    </property>
+    <property>
+        <name>yarn.nodemanager.vmem-check-enabled</name>
+        <value>false</value>
+        <description>不检查虚拟内存，否则很容易会把Job执行进程Kill掉</description>
     </property>
 </configuration>

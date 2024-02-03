@@ -1,6 +1,9 @@
-export JAVA_HOME=/opt/bitnami/java # 指定为bitnami镜像自带的jdk
-export HADOOP_HOME=/opt/hadoop # 安装目录
-export HADOOP_LOG_DIR=$HADOOP_HOME/logs # 日志目录
+# 指定为bitnami镜像自带的jdk
+export JAVA_HOME=/opt/bitnami/java
+# 安装目录
+export HADOOP_HOME=/opt/hadoop
+# 日志目录
+export HADOOP_LOG_DIR=$HADOOP_HOME/logs
 export HADOOP_MAPRED_HOME=/opt/hadoop
 export HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
 export HADOOP_COMMON_LIB_NATIVE_DIR=$HADOOP_HOME/lib/native

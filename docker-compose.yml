@@ -12,6 +12,7 @@ services:
       - ~/docker/spark/share:/opt/share # 三个容器映射到相同的共享目录
     ports:
       - '8080:8080'
+      - '8088:8088'
       - '4040:4040'
       - '8042:8042'
       - '9870:9870'
@@ -44,7 +45,7 @@ services:
       - haspark-hdfs-worker2-data:/root/hdfs/data # datanode数据
     ports:
       - '8082:8081'
-      - '8088:8088'
+      - '8089:8088'
       - '9871:9870'
 
 volumes:

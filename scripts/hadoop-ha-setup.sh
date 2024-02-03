@@ -82,7 +82,7 @@ if [[ "$HA_HDFS_SETUP_ON_STARTUP" == "true" ]]; then
     # 如果JournalNode在本机上需要启动
     if [[ "$HA_JOURNALNODE_HOSTS" = *$(hostname)* ]]; then
         echo "Starting JournalNode on $(hostname)..."
-        hdfs --daemon start journalnode # 守护模式启动journalnode
+        $HADOOP_HOME/bin/hdfs --daemon start journalnode # 守护模式启动journalnode
     fi
 
     # 协调: 等待所有结点的JournalNode启动
@@ -103,13 +103,23 @@ if [[ "$HA_HDFS_SETUP_ON_STARTUP" == "true" ]]; then
             # 如果本机是第一个NameNode
             # HDFS和ZKFC的格式化只需要在namenode所在主机的其中一台执行即可
             echo "Formatting HDFS..."
-            hdfs namenode -format
+            if [ -z "$(ls /root/hdfs/name 2>/dev/null)" ]; then
+                # 当NameNode目录为空时才格式化
+                echo "-> Formatting NameNode..."
+                $HADOOP_HOME/bin/hdfs namenode -format
+            elif [ -z "$(ls /root/hdfs/journal 2>/dev/null)" ]; then
+                # 当JournalNode目录为空时才初始化
+                echo "-> Initializing JournalNode..."
+                hdfs namenode -initializeSharedEdits
+            else
+                echo "NameNode and JournalNode directory already formatted, skipping format."
+            fi
             echo "Formatting ZKFC..."
-            hdfs zkfc -formatZK
+            $HADOOP_HOME/bin/hdfs zkfc -formatZK
         elif [[ "$HA_NAMENODE_HOSTS" = *$(hostname)* ]]; then
             # 如果本机不是首个NameNode，但也是NameNode，则同步元数据
             echo "Syncing HDFS metadata..."
-            hdfs namenode -bootstrapStandby
+            $HADOOP_HOME/bin/hdfs namenode -bootstrapStandby
         fi
     fi
 
@@ -118,15 +128,15 @@ if [[ "$HA_HDFS_SETUP_ON_STARTUP" == "true" ]]; then
     # 如果NameNode在本机上需要启动
     if [[ "$HA_NAMENODE_HOSTS" = *$(hostname)* ]]; then
         echo "Starting NameNode on $(hostname)..."
-        hdfs --daemon start namenode # 守护模式启动namenode
+        $HADOOP_HOME/bin/hdfs --daemon start namenode # 守护模式启动namenode
         echo "Starting ZKFC on $(hostname)..."
-        hdfs --daemon start zkfc # 有namenode就需要启动ZKFC
+        $HADOOP_HOME/bin/hdfs --daemon start zkfc # 有namenode就需要启动ZKFC
     fi
 
     # 如果DataNode需要在本机上启动
     if [[ "$HA_DATANODE_HOSTS" = *$(hostname)* ]]; then
         echo "Starting DataNode on $(hostname)..."
-        hdfs --daemon start datanode # 守护模式启动datanode
+        $HADOOP_HOME/bin/hdfs --daemon start datanode # 守护模式启动datanode
     fi
 
     # ################# 容器每次启动都执行的部分 SECTION2-END #################
@@ -193,13 +203,13 @@ if [[ "$HA_YARN_SETUP_ON_STARTUP" == "true" ]]; then
     # 如果ResourceManager在本机上需要启动
     if [[ "$HA_RESOURCEMANAGER_HOSTS" = *$(hostname)* ]]; then
         echo "Starting ResourceManager on $(hostname)..."
-        yarn --daemon start resourcemanager # 守护模式启动RM
+        $HADOOP_HOME/bin/yarn --daemon start resourcemanager # 守护模式启动RM
     fi
 
     # 如果DataNode需要在本机上启动
     if [[ "$HA_NODEMANAGER_HOSTS" = *$(hostname)* ]]; then
         echo "Starting NodeManager on $(hostname)..."
-        yarn --daemon start nodemanager # 守护模式启动NM
+        $HADOOP_HOME/bin/yarn --daemon start nodemanager # 守护模式启动NM
     fi
 
     # ################# 容器每次启动都执行的部分 SECTION-END #################

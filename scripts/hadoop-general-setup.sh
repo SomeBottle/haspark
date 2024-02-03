@@ -27,7 +27,12 @@ if [ -e $INIT_FLAG_FILE ]; then
     done
     # 初始化HDFS
     echo "Formatting HDFS..."
-    hdfs namenode -format
+    if [ -z "$(ls /root/hdfs/name 2>/dev/null)" ]; then
+        # 仅当NameNode目录为空时才格式化
+        $HADOOP_HOME/bin/hdfs namenode -format
+    else
+        echo "NameNode directory already formatted, skipping format."
+    fi
 fi
 
 # ***************** Hadoop组件启动逻辑 *****************
@@ -36,11 +41,11 @@ if [[ "$GN_HDFS_SETUP_ON_STARTUP" == "true" ]]; then
     # 如果本机为Hadoop HDFS的master，则启动NameNode
     if [[ "$GN_NAMENODE_HOST" == "$(hostname)" ]]; then
         echo "Starting HDFS NameNode on $(hostname)..."
-        hdfs --daemon start namenode # 启动namenode
+        $HADOOP_HOME/bin/hdfs --daemon start namenode # 启动namenode
         # 如果配置了GN_DATANODE_ON_MASTER，则还在本节点启动DataNode
         if [[ "$GN_DATANODE_ON_MASTER" == "true" ]]; then
             echo "Starting DataNode on $(hostname)..."
-            hdfs --daemon start datanode # 守护模式启动datanode
+            $HADOOP_HOME/bin/hdfs --daemon start datanode # 守护模式启动datanode
         fi
     fi
     # 如果本机为工作结点，启动DataNode
@@ -48,12 +53,12 @@ if [[ "$GN_HDFS_SETUP_ON_STARTUP" == "true" ]]; then
     if [[ "$GN_HADOOP_WORKER_HOSTS" == *$(hostname)* ]]; then
         # GN_HADOOP_WORKER_HOSTS中肯定不会有GN_NAMENODE_HOST结点
         echo "Starting DataNode on worker node $(hostname)..."
-        hdfs --daemon start datanode # 常规模式启动datanode
+        $HADOOP_HOME/bin/hdfs --daemon start datanode # 常规模式启动datanode
     fi
     # 如果本机需要启动SecondaryNameNode则启动
     if [[ "$GN_SECONDARY_DATANODE_HOST" == $(hostname) ]]; then
         echo "Starting SecondaryNameNode on $(hostname)..."
-        hdfs --daemon start secondarynamenode
+        $HADOOP_HOME/bin/hdfs --daemon start secondarynamenode
     fi
 fi
 
@@ -63,15 +68,15 @@ if [[ "$GN_YARN_SETUP_ON_STARTUP" == "true" ]]; then
     # 如果本机为Yarn的ResourceManager所在节点
     if [[ "$GN_RESOURCEMANAGER_HOST" == "$(hostname)" ]]; then
         echo "Starting Yarn ResourceManager on $(hostname)..."
-        yarn --daemon start resourcemanager # 启动resourcemanager
+        $HADOOP_HOME/bin/yarn --daemon start resourcemanager # 启动resourcemanager
         # 如果配置了GN_NODEMANAGER_WITH_RESOURCEMANAGER，则还要在此节点启动NodeManager
         if [[ "$GN_NODEMANAGER_WITH_RESOURCEMANAGER" == "true" ]]; then
             echo "Starting NodeManager on $(hostname)..."
-            yarn --daemon start nodemanager # 启动nodemanager
+            $HADOOP_HOME/bin/yarn --daemon start nodemanager # 启动nodemanager
         fi
     elif [[ "$SH_HOSTS" = *$(hostname)* ]]; then
         # 如果不是ResourceManager所在节点
         echo "Starting NodeManager on $(hostname)..."
-        yarn --daemon start nodemanager # 启动nodemanager
+        $HADOOP_HOME/bin/yarn --daemon start nodemanager # 启动nodemanager
     fi
 fi

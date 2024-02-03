@@ -10,7 +10,10 @@ mkdir -p /opt/somebottle/haspark/logs
 
 # 导出到/etc/profile中，以在用户登录后的新Shell中也保持有效
 # 上面export的只能在当前Shell及子进程中有效
-echo -e '#!/bin/bash\nexport SH_HOSTS="'$SH_HOSTS'"\nexport HOME='$HOME >/etc/profile.d/sh_basics.sh
+echo -e 'export SH_HOSTS="'$SH_HOSTS'"\nexport HOME='$HOME >/etc/profile.d/sh_basics.sh
+
+# 把JAVA_HOME也输出到/etc/profile
+echo "export JAVA_HOME=$JAVA_HOME" >/etc/profile.d/java.sh
 
 if [ -e $INIT_FLAG_FILE ]; then
     # 仅在容器初次启动时执行

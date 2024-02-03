@@ -10,7 +10,7 @@
   <!--ipc连接重试配置-->
   <property>
     <name>ipc.client.connect.max.retries</name>
-    <value>20</value>
+    <value>50</value>
     <description>Indicates the number of retries a client will make to establish a server connection.</description>
   </property>
   <property>
