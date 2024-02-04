@@ -23,8 +23,8 @@
         <value>JAVA_HOME,HADOOP_COMMON_HOME,HADOOP_HDFS_HOME,HADOOP_CONF_DIR,CLASSPATH_PREPEND_DISTCACHE,HADOOP_YARN_HOME,HADOOP_MAPRED_HOME</value>
     </property>
 
+    <!-- @#HA_CONF_START#@ 和 @#HA_CONF_END#@ 包裹的是高可用配置（请不要把本注释放在高可用配置里）-->
     @#HA_CONF_START#@
-    <!-- @#HA_CONF_START#@ 和 @#HA_CONF_END#@ 包裹的是高可用配置-->
     <property>
         <name>yarn.resourcemanager.ha.enabled</name>
         <value>true</value>

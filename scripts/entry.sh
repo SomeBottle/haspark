@@ -4,13 +4,26 @@
 # 修正家目录，bitnami不知道怎么想的，把文件系统根目录当家目录
 # 不修正的话，ssh-copy-id没法正常运作
 export HOME="$(eval echo ~$(whoami))"
+# 各组件的守护进程启动顺序
+export HDFS_DAEMON_SEQ_FILE=/opt/somebottle/haspark/daemon_sequence/hdfs.seq
+export YARN_DAEMON_SEQ_FILE=/opt/somebottle/haspark/daemon_sequence/yarn.seq
 
 # 创建容器部署日志目录
 mkdir -p /opt/somebottle/haspark/logs
+# 创建守护进程启动记录目录
+# 这里存储的是守护进程的启动顺序，用于start/stop dfs/yarn/all脚本的实现。
+mkdir -p /opt/somebottle/haspark/daemon_sequence
+touch $HDFS_DAEMON_SEQ_FILE
+touch $YARN_DAEMON_SEQ_FILE
 
-# 导出到/etc/profile中，以在用户登录后的新Shell中也保持有效
 # 上面export的只能在当前Shell及子进程中有效
-echo -e 'export SH_HOSTS="'$SH_HOSTS'"\nexport HOME='$HOME >/etc/profile.d/sh_basics.sh
+# 导出到/etc/profile中，以在用户登录后的新Shell中也保持有效
+echo -e "export SH_HOSTS='$SH_HOSTS'\n\
+export HOME='$HOME'\n\
+export HDFS_DAEMON_SEQ_FILE='$HDFS_DAEMON_SEQ_FILE'\n\
+export YARN_DAEMON_SEQ_FILE='$YARN_DAEMON_SEQ_FILE'\n\
+export TEMP_PASS_FILE='$TEMP_PASS_FILE'\n\
+export INIT_FLAG_FILE='$INIT_FLAG_FILE'\n" >/etc/profile.d/sh_basics.sh
 
 # 把JAVA_HOME也输出到/etc/profile
 echo "export JAVA_HOME=$JAVA_HOME" >/etc/profile.d/java.sh

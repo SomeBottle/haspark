@@ -109,6 +109,12 @@ docker pull somebottle/haspark
 
 脚本实际位于`/opt/somebottle/haspark/tools/zoo`。
 
+### 3. Hadoop集群启停脚本
+
+命令行: `start-hadoop.sh | stop-hadoop.sh | start-all.sh | stop-all.sh`  
+
+脚本实际位于`/opt/somebottle/haspark/tools/`中。
+
 ## 容器部署
 
 ### 1. 拉取
@@ -172,13 +178,13 @@ docker compose down -v # v代表volumes
 按理说容器启动后，**在完成免密登录配置后会自动执行**Hadoop集群启动脚本，如果没有的话你可以手动执行:  
 
 ```bash
-/opt/somebottle/haspark/start-hadoop.sh  
+start-hadoop.sh  
 ```
 
 Hadoop集群停止脚本：
 
 ```bash
-/opt/somebottle/haspark/stop-hadoop.sh  
+stop-hadoop.sh  
 ```
 
 ## 容器内常用端口
@@ -210,7 +216,9 @@ Hadoop集群停止脚本：
 
 * NameNode: `/root/hdfs/name`  
 * DataNode: `/root/hdfs/data`  
-* JournalNode: `/root/hdfs/journal`
+* JournalNode: `/root/hdfs/journal`  
+
+> 建议挂载卷(Volume)到NameNode和DataNode的目录上，可以保留HDFS的数据。
 
 ### 日志
 * Hadoop的日志位于`/opt/hadoop/logs`目录。

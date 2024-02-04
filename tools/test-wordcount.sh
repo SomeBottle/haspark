@@ -5,3 +5,9 @@
 echo "Hello World My World" > /tmp/hello.txt
 hdfs dfs -put /tmp/hello.txt /
 hadoop jar $HADOOP_HOME/share/hadoop/mapreduce/hadoop-mapreduce-examples-3.3.6.jar wordcount /hello.txt /out
+sleep 1
+echo "############ Result: "
+hdfs dfs -cat /out/*
+echo "############"
+hdfs dfs -rm /hello.txt
+hdfs dfs -rm -R /out

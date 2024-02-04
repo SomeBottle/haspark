@@ -18,6 +18,7 @@
         <name>dfs.replication</name>
         <value>%%HDFS_REPLICATION%%</value>
     </property>
+    
     <property>
         <!--
             取消DataNode节点所在主机的主机名（DNS）与对应IP地址的检查机制，
@@ -29,8 +30,8 @@
         <value>false</value>
     </property>
 
+    <!-- @#HA_CONF_START#@ 和 @#HA_CONF_END#@ 包裹的是高可用配置（请不要把本注释放在高可用配置里）-->
     @#HA_CONF_START#@
-    <!-- @#HA_CONF_START#@ 和 @#HA_CONF_END#@ 包裹的是高可用配置-->
     <property>
         <name>dfs.nameservices</name>
         <value>%%HDFS_NAMESERVICE%%</value>

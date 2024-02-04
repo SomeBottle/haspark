@@ -9,8 +9,8 @@ function join_by() {
     # param3：对于每个子字符串后面要加上的后缀字符串，比如":2888"会给worker1后面加上":2181"变成"worker1:2181"
     # 使用示例： join_by "$test_hosts" ',' ':2888'
     # 注意，请用双引号括起变量，否则命令行会处理空格导致传参错误。
-    old_IFS=$IFS
-    IFS=' ' # 原本是空格分隔
+    old_IFS=$IFS # 保存原本的IFS
+    IFS=' ' # 按空格分隔
     local arr=($1)
     local i=0
     local str=""
@@ -76,5 +76,15 @@ function replace_repeat_conf() {
     # 使用示例： remove_repeat_conf "NAMENODE" "testconf" "hdfs-site.xml"
 
     /opt/bitnami/python/bin/python /opt/somebottle/haspark/replace_with_pattern.py "@#HA_REPEAT_${1}_START#@" "@#HA_REPEAT_${1}_END#@" "$2" "$3"
+    return $?
+}
+
+function remove_ha_conf() {
+    # 移除配置中的高可用配置
+    # 这些配置往往由 @#HA_CONF_START#@ 和 @#HA_CONF_END#@ 包裹起来
+    # param1：配置文件路径
+    # 使用示例： remove_ha_conf "hdfs-site.xml"
+
+    /opt/bitnami/python/bin/python /opt/somebottle/haspark/replace_with_pattern.py "@#HA_CONF_START#@" "@#HA_CONF_END#@" "" "$1"
     return $?
 }

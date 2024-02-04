@@ -24,7 +24,7 @@ ENV HADOOP_CONF_DIR="/opt/hadoop/etc/hadoop"
 # Hadoop日志目录
 ENV HADOOP_LOG_DIR="/opt/hadoop/logs"
 # 把Hadoop目录加入环境变量
-ENV PATH="$HADOOP_HOME/sbin:$HADOOP_HOME/bin:/opt/somebottle/haspark/tools:$ZOOKEEPER_HOME/bin:$PATH"
+ENV PATH="$HADOOP_HOME/bin:/opt/somebottle/haspark/tools:$ZOOKEEPER_HOME/bin:$PATH"
 # 临时密码文件路径加入环境变量
 ENV TEMP_PASS_FILE="/root/temp.pass"
 # 用户.ssh配置目录

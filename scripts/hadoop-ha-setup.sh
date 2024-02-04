@@ -82,6 +82,7 @@ if [[ "$HA_HDFS_SETUP_ON_STARTUP" == "true" ]]; then
     # 如果JournalNode在本机上需要启动
     if [[ "$HA_JOURNALNODE_HOSTS" = *$(hostname)* ]]; then
         echo "Starting JournalNode on $(hostname)..."
+        echo "journalnode" >>$HDFS_DAEMON_SEQ_FILE
         $HADOOP_HOME/bin/hdfs --daemon start journalnode # 守护模式启动journalnode
     fi
 
@@ -128,14 +129,17 @@ if [[ "$HA_HDFS_SETUP_ON_STARTUP" == "true" ]]; then
     # 如果NameNode在本机上需要启动
     if [[ "$HA_NAMENODE_HOSTS" = *$(hostname)* ]]; then
         echo "Starting NameNode on $(hostname)..."
+        echo "namenode" >>$HDFS_DAEMON_SEQ_FILE
         $HADOOP_HOME/bin/hdfs --daemon start namenode # 守护模式启动namenode
         echo "Starting ZKFC on $(hostname)..."
+        echo "zkfc" >>$HDFS_DAEMON_SEQ_FILE
         $HADOOP_HOME/bin/hdfs --daemon start zkfc # 有namenode就需要启动ZKFC
     fi
 
     # 如果DataNode需要在本机上启动
     if [[ "$HA_DATANODE_HOSTS" = *$(hostname)* ]]; then
         echo "Starting DataNode on $(hostname)..."
+        echo "datanode" >>$HDFS_DAEMON_SEQ_FILE
         $HADOOP_HOME/bin/hdfs --daemon start datanode # 守护模式启动datanode
     fi
 
@@ -203,12 +207,14 @@ if [[ "$HA_YARN_SETUP_ON_STARTUP" == "true" ]]; then
     # 如果ResourceManager在本机上需要启动
     if [[ "$HA_RESOURCEMANAGER_HOSTS" = *$(hostname)* ]]; then
         echo "Starting ResourceManager on $(hostname)..."
+        echo "resourcemanager" >>$YARN_DAEMON_SEQ_FILE
         $HADOOP_HOME/bin/yarn --daemon start resourcemanager # 守护模式启动RM
     fi
 
     # 如果DataNode需要在本机上启动
     if [[ "$HA_NODEMANAGER_HOSTS" = *$(hostname)* ]]; then
         echo "Starting NodeManager on $(hostname)..."
+        echo "nodemanager" >>$YARN_DAEMON_SEQ_FILE
         $HADOOP_HOME/bin/yarn --daemon start nodemanager # 守护模式启动NM
     fi
 
