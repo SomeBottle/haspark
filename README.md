@@ -1,4 +1,4 @@
-# Hadoop + Spark 分布式容器化部署镜像
+# Hadoop + Spark 容器化部署镜像
 
 本镜像基于`bitnami/spark:3.5.0`镜像，系统为`Debian 11`，执行用户为`root`。 
 
@@ -315,9 +315,9 @@ stop-all.sh
 * DataNode: `/root/hdfs/data`  
 * JournalNode: `/root/hdfs/journal`  
 
-> -> 建议挂载卷(Volume)到NameNode和DataNode以及JournalNode的目录上，可以保留HDFS的数据。
+> -> 建议挂载卷(Volume)到NameNode和DataNode以及JournalNode的目录上，可以保留HDFS的数据。  
 > -> 尤其在**高可用**集群中，要注意根据NameNode和DataNode所在容器决定挂载规则。  
-> -----> 比如在只有NameNode的节点上可以仅挂载NameNode的卷，但若同时还有DataNode，则也要挂载DataNode的卷。
+> -----> 比如在只有NameNode的节点上可以仅挂载NameNode的卷，但若同时还有DataNode，则也要挂载DataNode的卷。  
 
 ### 7.2. 日志
 * Hadoop的日志位于`/opt/hadoop/logs`目录。
