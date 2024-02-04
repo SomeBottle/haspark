@@ -111,7 +111,10 @@ docker pull somebottle/haspark
 
 ### 3. Hadoop集群启停脚本
 
-命令行: `start-hadoop.sh | stop-hadoop.sh | start-all.sh | stop-all.sh`  
+命令行: 
+
+1. 启动集群中所有节点的相应守护进程: `start-dfs.sh | stop-dfs.sh | start-yarn.sh | stop-yarn.sh | start-all.sh | stop-all.sh`  
+2. 启动本机的相应守护进程: `start-dfs-local.sh | stop-dfs-local.sh | start-yarn-local.sh | stop-yarn-local.sh | start-all-local.sh | stop-all-local.sh`
 
 脚本实际位于`/opt/somebottle/haspark/tools/`中。
 
