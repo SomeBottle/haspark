@@ -39,6 +39,20 @@
         <value>--add-opens java.base/java.lang=ALL-UNNAMED</value>
         <description>map/reduce任务相关进程的JVM参数</description>
     </property>
+    <property>
+        <!--
+            解决Job在map 0% reduce 0%阶段就因为
+            java.lang.reflect.InaccessibleObjectException
+            而失败的问题，根源是launch_container.sh中在启动MPAppMaster的时候没有带上add-opens参数
 
+            在官方文档:
+            https://hadoop.apache.org/docs/r3.0.0/hadoop-mapreduce-client/hadoop-mapreduce-client-core/mapred-default.xml
+            中可以看到这个属性默认有一个-Xmx1024m配置，这里也加上。
 
+            吐槽：这个属性竟然不叫java-opts，找了一天没找着，太坑壁了。
+        -->
+        <name>yarn.app.mapreduce.am.command-opts</name>
+        <value>--add-opens java.base/java.lang=ALL-UNNAMED -Xmx1024m</value>
+        <description>MR App Master进程的JVM参数</description>
+    </property>
 </configuration>

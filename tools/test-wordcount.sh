@@ -4,4 +4,4 @@
 
 echo "Hello World My World" > /tmp/hello.txt
 hdfs dfs -put /tmp/hello.txt /
-hadoop jar $HADOOP_HOME/share/hadoop/mapreduce/hadoop-mapreduce-examples-3.3.6.jar wordcount -Dmapreduce.map.java.opts="--add-opens java.base/java.lang=ALL-UNNAMED" -Dmapreduce.map.java.opts="--add-opens java.base/java.lang=ALL-UNNAMED" /hello.txt /out
+hadoop jar $HADOOP_HOME/share/hadoop/mapreduce/hadoop-mapreduce-examples-3.3.6.jar wordcount /hello.txt /out
