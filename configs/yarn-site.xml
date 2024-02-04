@@ -14,9 +14,13 @@
         <value>%%YARN_RESOURCEMANAGER_HOST%%</value>
     </property>
     <property>
+        <!--注意！！！value这里不要有换行符! 不然环境变量无法成功配置-->
+        <!--
+            感谢：
+            https://stackoverflow.com/questions/74745268/hadoop-mapreduce-job-failing-in-launch-container-sh
+        -->
         <name>yarn.nodemanager.env-whitelist</name>
-        <value>
-            JAVA_HOME,HADOOP_COMMON_HOME,HADOOP_HDFS_HOME,HADOOP_CONF_DIR,CLASSPATH_PREPEND_DISTCACHE,HADOOP_YARN_HOME,HADOOP_MAPRED_HOME</value>
+        <value>JAVA_HOME,HADOOP_COMMON_HOME,HADOOP_HDFS_HOME,HADOOP_CONF_DIR,CLASSPATH_PREPEND_DISTCACHE,HADOOP_YARN_HOME,HADOOP_MAPRED_HOME</value>
     </property>
 
     @#HA_CONF_START#@
@@ -91,9 +95,11 @@
         <name>yarn.scheduler.minimum-allocation-mb</name>
         <value>256</value>
     </property>
+    <!--
     <property>
         <name>yarn.nodemanager.vmem-check-enabled</name>
         <value>false</value>
         <description>不检查虚拟内存，否则很容易会把Job执行进程Kill掉</description>
     </property>
+    -->
 </configuration>

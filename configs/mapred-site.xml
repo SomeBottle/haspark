@@ -33,5 +33,12 @@
         <value>%%YARN_REDUCE_MEMORY_MB%%</value>
         <description>每个Reduce Task工作内存</description>
     </property>
+    <!--这里和hadoop-env.sh中一样要配置关于JDK17反射机制的一些参数-->
+    <property>
+        <name>mapred.child.java.opts</name>
+        <value>--add-opens java.base/java.lang=ALL-UNNAMED</value>
+        <description>map/reduce任务相关进程的JVM参数</description>
+    </property>
+
 
 </configuration>

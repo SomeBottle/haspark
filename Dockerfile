@@ -136,8 +136,5 @@ RUN chmod +x /opt/somebottle/haspark/tools/*
 COPY lib/jsch-0.2.16.jar /opt/hadoop/share/hadoop/hdfs/lib/jsch-0.1.55.jar
 COPY lib/jsch-0.2.16.jar /opt/hadoop/share/hadoop/common/lib/jsch-0.1.55.jar
 
-# 暴力解决Yarn Container启动时的JAVA_HOME未定义问题（太玄学了，到处查也没找到真正的解决方法）
-RUN ln -s /opt/bitnami/java/bin/java /bin/java
-
 # 容器启动待执行的脚本
 ENTRYPOINT [ "/opt/somebottle/haspark/entry.sh" ]
