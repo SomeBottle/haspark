@@ -1,4 +1,4 @@
-# Hadoop + Spark 分布式容器化部署
+# Hadoop + Spark 分布式容器化部署镜像
 
 本镜像基于`bitnami/spark:3.5.0`镜像，系统为`Debian 11`，执行用户为`root`。  
 
@@ -116,7 +116,13 @@ docker pull somebottle/haspark
 1. 启动集群中所有节点的相应守护进程: `start-dfs.sh | stop-dfs.sh | start-yarn.sh | stop-yarn.sh | start-all.sh | stop-all.sh`  
 2. 启动本机的相应守护进程: `start-dfs-local.sh | stop-dfs-local.sh | start-yarn-local.sh | stop-yarn-local.sh | start-all-local.sh | stop-all-local.sh`
 
-脚本实际位于`/opt/somebottle/haspark/tools/`中。
+### 4. WordCount测试脚本
+
+本脚本用于测试Hadoop集群是否能正常工作。
+
+命令行: `test-wordcount.sh`
+
+脚本实际位于`/opt/somebottle/haspark/tools/test-wordcount.sh`中。
 
 ## 容器部署
 
@@ -158,7 +164,20 @@ docker pull somebottle/haspark[:tag]
 docker compose up -d
 ```
 
-### 4. 下线容器
+### 4. 停止和启动容器
+
+> ⚠️ 建议你在执行这一步前先调用`stop-all.sh`脚本停止Hadoop集群。  
+
+在`docker-compose.yml`所在目录中执行。
+
+```bash
+docker compose stop # 停止容器
+docker compose start # 启动容器
+```
+
+### 5. 下线容器
+
+> ⚠️ 建议你在执行这一步前先调用`stop-all.sh`脚本停止Hadoop集群。  
 
 在`docker-compose.yml`所在目录中执行。
 
@@ -176,7 +195,7 @@ docker compose down
 docker compose down -v # v代表volumes
 ```
 
-### 5. 启动与停止Hadoop
+### 6. 启动与停止Hadoop
 
 按理说容器启动后，**在完成免密登录配置后会自动执行**Hadoop集群启动脚本，如果没有的话你可以手动执行:  
 
@@ -221,7 +240,9 @@ stop-hadoop.sh
 * DataNode: `/root/hdfs/data`  
 * JournalNode: `/root/hdfs/journal`  
 
-> 建议挂载卷(Volume)到NameNode和DataNode的目录上，可以保留HDFS的数据。
+> -> 建议挂载卷(Volume)到NameNode和DataNode以及JournalNode的目录上，可以保留HDFS的数据。
+> -> 尤其在**高可用**集群中，要注意根据NameNode和DataNode所在容器决定挂载规则。  
+> -> 比如在只有NameNode的节点上可以仅挂载NameNode的卷，但若同时还有DataNode，则也要挂载DataNode的卷。
 
 ### 日志
 * Hadoop的日志位于`/opt/hadoop/logs`目录。

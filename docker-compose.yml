@@ -8,7 +8,9 @@ services:
     environment:
       - SPARK_MODE=master
     volumes:
-      - haspark-hdfs-name-data:/root/hdfs/name:copy # 映射docker卷到主容器的/root/hdfs/name，创建卷时复制镜像中初始化过的namenode数据
+      - haspark-hdfs-shmain-name:/root/hdfs/name:copy # 映射docker卷到主容器的/root/hdfs/name，创建卷时复制镜像中初始化过的namenode数据
+      - haspark-hdfs-shmain-journal:/root/hdfs/journal
+      - haspark-hdfs-shmain-data:/root/hdfs/data
       - ~/docker/spark/share:/opt/share # 三个容器映射到相同的共享目录
     ports:
       - '8080:8080'
@@ -28,6 +30,8 @@ services:
       - SPARK_WORKER_CORES=1
     volumes:
       - ~/docker/spark/share:/opt/share
+      - haspark-hdfs-worker1-name:/root/hdfs/name:copy # namenode数据
+      - haspark-hdfs-worker1-journal:/root/hdfs/journal
       - haspark-hdfs-worker1-data:/root/hdfs/data # datanode数据
     ports:
       - '8081:8081'
@@ -42,6 +46,8 @@ services:
       - SPARK_WORKER_CORES=1
     volumes:
       - ~/docker/spark/share:/opt/share
+      - haspark-hdfs-worker2-name:/root/hdfs/name:copy # namenode数据
+      - haspark-hdfs-worker2-journal:/root/hdfs/journal
       - haspark-hdfs-worker2-data:/root/hdfs/data # datanode数据
     ports:
       - '8082:8081'
@@ -49,6 +55,12 @@ services:
       - '9871:9870'
 
 volumes:
-  haspark-hdfs-name-data:
+  haspark-hdfs-shmain-name:
+  haspark-hdfs-shmain-data:
+  haspark-hdfs-shmain-journal:
+  haspark-hdfs-worker1-name:
   haspark-hdfs-worker1-data:
+  haspark-hdfs-worker1-journal:
+  haspark-hdfs-worker2-name:
   haspark-hdfs-worker2-data:
+  haspark-hdfs-worker2-journal:

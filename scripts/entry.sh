@@ -13,8 +13,8 @@ mkdir -p /opt/somebottle/haspark/logs
 # 创建守护进程启动记录目录
 # 这里存储的是守护进程的启动顺序，用于start/stop dfs/yarn/all脚本的实现。
 mkdir -p /opt/somebottle/haspark/daemon_sequence
-touch $HDFS_DAEMON_SEQ_FILE
-touch $YARN_DAEMON_SEQ_FILE
+echo '' >$HDFS_DAEMON_SEQ_FILE
+echo '' >$YARN_DAEMON_SEQ_FILE
 
 # 上面export的只能在当前Shell及子进程中有效
 # 导出到/etc/profile中，以在用户登录后的新Shell中也保持有效

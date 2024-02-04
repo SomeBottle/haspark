@@ -107,11 +107,12 @@ if [[ "$HA_HDFS_SETUP_ON_STARTUP" == "true" ]]; then
             if [ -z "$(ls /root/hdfs/name 2>/dev/null)" ]; then
                 # 当NameNode目录为空时才格式化
                 echo "-> Formatting NameNode..."
-                $HADOOP_HOME/bin/hdfs namenode -format
+                # nonInteractive选项保证如果已经格式化过，不会询问用户再次格式化，而是直接跳过。
+                $HADOOP_HOME/bin/hdfs namenode -format -nonInteractive
             elif [ -z "$(ls /root/hdfs/journal 2>/dev/null)" ]; then
                 # 当JournalNode目录为空时才初始化
                 echo "-> Initializing JournalNode..."
-                hdfs namenode -initializeSharedEdits
+                hdfs namenode -initializeSharedEdits -nonInteractive
             else
                 echo "NameNode and JournalNode directory already formatted, skipping format."
             fi
@@ -120,7 +121,8 @@ if [[ "$HA_HDFS_SETUP_ON_STARTUP" == "true" ]]; then
         elif [[ "$HA_NAMENODE_HOSTS" = *$(hostname)* ]]; then
             # 如果本机不是首个NameNode，但也是NameNode，则同步元数据
             echo "Syncing HDFS metadata..."
-            $HADOOP_HOME/bin/hdfs namenode -bootstrapStandby
+            # nonInteractive选项保证如果已经格式化过，不会询问用户再次格式化，而是直接跳过。
+            $HADOOP_HOME/bin/hdfs namenode -bootstrapStandby -nonInteractive
         fi
     fi
 

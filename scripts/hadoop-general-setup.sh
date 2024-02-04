@@ -31,7 +31,8 @@ if [ -e $INIT_FLAG_FILE ]; then
     echo "Formatting HDFS..."
     if [ -z "$(ls /root/hdfs/name 2>/dev/null)" ]; then
         # 仅当NameNode目录为空时才格式化
-        $HADOOP_HOME/bin/hdfs namenode -format
+        # nonInteractive选项保证如果已经格式化过，不会询问用户再次格式化，而是直接跳过。
+        $HADOOP_HOME/bin/hdfs namenode -format -nonInteractive
     else
         echo "NameNode directory already formatted, skipping format."
     fi
