@@ -3,7 +3,7 @@
 # 适配Hadoop 3.3+
 FROM bitnami/spark:3.5.0
 
-LABEL maintainer="somebottle <somebottle@gmail.com>"
+LABEL maintainer="somebottle <somebottle@outlook.com>"
 LABEL description="Docker image with Spark 3.5.0 and Hadoop 3.3.6, based on bitnami/spark image. For my graduation project." 
 
 # 环境变量配置
@@ -25,6 +25,9 @@ ENV HADOOP_CONF_DIR="/opt/hadoop/etc/hadoop"
 ENV HADOOP_LOG_DIR="/opt/hadoop/logs"
 # 把Hadoop目录加入环境变量
 ENV PATH="$HADOOP_HOME/bin:/opt/somebottle/haspark/tools:$ZOOKEEPER_HOME/bin:$PATH"
+# 把Hadoop本地库加入动态链接库路径
+# 以免Spark或Hadoop找不到Hadoop Native Library
+ENV LD_LIBRARY_PATH="$HADOOP_HOME/lib/native:$LD_LIBRARY_PATH"
 # 临时密码文件路径加入环境变量
 ENV TEMP_PASS_FILE="/root/temp.pass"
 # 用户.ssh配置目录
@@ -48,8 +51,11 @@ ENV HA_YARN_SETUP_ON_STARTUP="false"
 # 以Root用户完成
 USER root
 
-# 将环境变量写入/etc/profile.d/container_env.sh
-RUN echo -e '#!/bin/bash\nexport PATH='$PATH > /etc/profile.d/container_env.sh
+# 将路径环境变量写入/etc/profile.d/path_env.sh
+RUN echo -e "#!/bin/bash\nexport PATH=$PATH\nexport LD_LIBRARY_PATH=$LD_LIBRARY_PATH" > /etc/profile.d/path_env.sh
+
+# 将Hadoop部分环境变量写入/etc/profile.d/hadoop.sh
+RUN echo -e "#!/bin/bash\nexport HADOOP_HOME=$HADOOP_HOME\nexport HADOOP_CONF_DIR=$HADOOP_CONF_DIR" >> /etc/profile.d/hadoop.sh
 
 # 创建容器启动标识文件
 RUN touch $INIT_FLAG_FILE
@@ -71,7 +77,7 @@ RUN mv /tmp/sources.list /etc/apt/sources.list
 
 # 更新apt-get以及openssh-server, wget, vim, sshpass, net-tools, psmisc
 # psmisc包含Hadoop HA - sshfence所需的fuser工具
-RUN apt-get update && apt-get install -y openssh-server wget vim sshpass lsof net-tools psmisc
+RUN apt-get update && apt-get install -y openssh-server wget vim sshpass lsof net-tools psmisc rsync zip
 
 # 建立haspark脚本目录
 RUN mkdir -p /opt/somebottle/haspark

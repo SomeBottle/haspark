@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# 文件同步脚本
+
+# 先让环境变量生效
+source /etc/profile
+
+# 临时密码文件还存在就说明SSH公钥还没交换完毕，需要等待交换完毕
+while [ -e $TEMP_PASS_FILE ]; do
+    sleep 3
+done
+
+echo "Syncing files..."
+
+# 至少要有一个参数，空格分隔
+if [ $# -lt 1 ]; then
+    echo 'Please input file path(s) ! '
+    exit 1
+fi
+
+# 遍历集群所有节点
+for host in $SH_HOSTS; do
+    echo ==================== Transfering files to $host ====================
+    for file in $@; do
+        if [ -e $file ]; then
+            # 获得文件父目录的绝对路径
+            parent_dir=$(
+                cd -P $(dirname $file)
+                pwd
+            )
+            #6. 获取当前文件的名称
+            file_name=$(basename $file)
+            ssh $host "mkdir -p $parent_dir"
+            rsync -av $parent_dir/$file_name $host:$parent_dir
+        else
+            echo $file not found.
+        fi
+    done
+done

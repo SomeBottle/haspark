@@ -1,8 +1,8 @@
 #!/bin/bash
 # 容器启动时执行的脚本
 
-# 修正家目录，bitnami不知道怎么想的，把文件系统根目录当家目录
-# 不修正的话，ssh-copy-id没法正常运作
+# 指定家目录
+# 不指定的话，ssh-copy-id没法正常运作
 export HOME="$(eval echo ~$(whoami))"
 # 各组件的守护进程启动顺序
 export HDFS_DAEMON_SEQ_FILE=/opt/somebottle/haspark/daemon_sequence/hdfs.seq

@@ -126,6 +126,14 @@ docker pull somebottle/haspark
 
 脚本实际位于`/opt/somebottle/haspark/tools/test-wordcount.sh`。
 
+### 4.5 文件同步脚本
+
+本脚本用于将某个节点上的文件同步到其他所有节点上（根据上面配置的 `$SH_HOSTS` 环境变量）。  
+
+命令行: `xsync <文件名列表>`  
+
+脚本实际位于`/opt/somebottle/haspark/tools/xsync`。
+
 ## 5. 容器部署
 
 ### 5.1. 拉取
@@ -152,7 +160,7 @@ version: '3'
 
 services:
   haspark-main:
-    image: somebottle/haspark:3.1.1
+    image: somebottle/haspark:3.1.2
     hostname: shmain
     env_file: ./conf.env
     environment:
@@ -170,7 +178,7 @@ services:
       - '9870:9870'
       - '19888:19888'
   haspark-worker-1:
-    image: somebottle/haspark:3.1.1
+    image: somebottle/haspark:3.1.2
     hostname: shworker1
     env_file: ./conf.env
     environment:
@@ -186,7 +194,7 @@ services:
     ports:
       - '8081:8081'
   haspark-worker-2:
-    image: somebottle/haspark:3.1.1
+    image: somebottle/haspark:3.1.2
     hostname: shworker2
     env_file: ./conf.env
     environment:
