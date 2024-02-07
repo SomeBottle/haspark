@@ -3,50 +3,50 @@
 # 适配Hadoop 3.3+
 FROM bitnami/spark:3.5.0
 
-LABEL maintainer="somebottle <somebottle@outlook.com>"
-LABEL description="Docker image with Spark 3.5.0 and Hadoop 3.3.6, based on bitnami/spark image. For my graduation project." 
+LABEL maintainer="somebottle <somebottle@outlook.com>" \
+    description="Docker image with Spark 3.5.0 and Hadoop 3.3.6, based on bitnami/spark image. For my graduation project." 
 
 # 环境变量配置
 # Zookeeper版本
-ENV ZOOKEEPER_VER="3.9.1"
-# Zookeeper安装目录
-ENV ZOOKEEPER_HOME="/opt/zookeeper"
-# Zookeeper配置目录
-ENV ZOOKEEPER_CONF_DIR="/opt/zookeeper/conf"
-# Zookeeper数据目录
-ENV ZOOKEEPER_DATA_DIR="/root/zooData"
-# Hadoop版本
-ENV HADOOP_VER="3.3.6" 
-# Hadoop安装目录
-ENV HADOOP_HOME="/opt/hadoop"
-# Hadoop配置目录
-ENV HADOOP_CONF_DIR="/opt/hadoop/etc/hadoop"
-# Hadoop日志目录
-ENV HADOOP_LOG_DIR="/opt/hadoop/logs"
+ENV ZOOKEEPER_VER="3.9.1" \
+    # Zookeeper安装目录
+    ZOOKEEPER_HOME="/opt/zookeeper" \
+    # Zookeeper配置目录
+    ZOOKEEPER_CONF_DIR="/opt/zookeeper/conf" \
+    # Zookeeper数据目录
+    ZOOKEEPER_DATA_DIR="/root/zooData" \
+    # Hadoop版本
+    HADOOP_VER="3.3.6" \
+    # Hadoop安装目录
+    HADOOP_HOME="/opt/hadoop" \
+    # Hadoop配置目录
+    HADOOP_CONF_DIR="/opt/hadoop/etc/hadoop" \
+    # Hadoop日志目录
+    HADOOP_LOG_DIR="/opt/hadoop/logs"
 # 把Hadoop目录加入环境变量
-ENV PATH="$HADOOP_HOME/bin:/opt/somebottle/haspark/tools:$ZOOKEEPER_HOME/bin:$PATH"
-# 把Hadoop本地库加入动态链接库路径
-# 以免Spark或Hadoop找不到Hadoop Native Library
-ENV LD_LIBRARY_PATH="$HADOOP_HOME/lib/native:$LD_LIBRARY_PATH"
-# 临时密码文件路径加入环境变量
-ENV TEMP_PASS_FILE="/root/temp.pass"
+ENV PATH="$HADOOP_HOME/bin:/opt/somebottle/haspark/tools:$ZOOKEEPER_HOME/bin:$PATH" \
+    # 把Hadoop本地库加入动态链接库路径
+    # 以免Spark或Hadoop找不到Hadoop Native Library
+    LD_LIBRARY_PATH="$HADOOP_HOME/lib/native:$LD_LIBRARY_PATH" \
+    # 临时密码文件路径加入环境变量
+    TEMP_PASS_FILE="/root/temp.pass"
 # 用户.ssh配置目录
-ENV USR_SSH_CONF_DIR="/root/.ssh"
-# 容器初次启动标识文件
-ENV INIT_FLAG_FILE="/root/init_flag"
+ENV USR_SSH_CONF_DIR="/root/.ssh" \
+    # 容器初次启动标识文件
+    INIT_FLAG_FILE="/root/init_flag"
 # 以下是一些环境变量默认值，用于Hadoop初始化
-ENV HADOOP_LAUNCH_MODE="general"
-ENV HADOOP_HDFS_REPLICATION="2"
-ENV HADOOP_MAP_MEMORY_MB="1024"
-ENV HADOOP_REDUCE_MEMORY_MB="1024"
-ENV GN_DATANODE_ON_MASTER="false"
-ENV GN_NODEMANAGER_WITH_RESOURCEMANAGER="false"
-ENV GN_NODEMANAGER_WITH_RESOURCEMANAGER="false"
-ENV GN_HDFS_SETUP_ON_STARTUP="false"
-ENV GN_YARN_SETUP_ON_STARTUP="false"
-ENV HA_HDFS_NAMESERVICE="hacluster"
-ENV HA_HDFS_SETUP_ON_STARTUP="false"
-ENV HA_YARN_SETUP_ON_STARTUP="false"
+ENV HADOOP_LAUNCH_MODE="general" \
+    HADOOP_HDFS_REPLICATION="2" \
+    HADOOP_MAP_MEMORY_MB="1024" \
+    HADOOP_REDUCE_MEMORY_MB="1024" \
+    GN_DATANODE_ON_MASTER="false" \
+    GN_NODEMANAGER_WITH_RESOURCEMANAGER="false" \
+    GN_NODEMANAGER_WITH_RESOURCEMANAGER="false" \
+    GN_HDFS_SETUP_ON_STARTUP="false" \
+    GN_YARN_SETUP_ON_STARTUP="false" \
+    HA_HDFS_NAMESERVICE="hacluster" \
+    HA_HDFS_SETUP_ON_STARTUP="false" \
+    HA_YARN_SETUP_ON_STARTUP="false"
 
 # 以Root用户完成
 USER root
