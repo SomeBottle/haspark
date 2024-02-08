@@ -73,6 +73,9 @@ RUN echo -e "#!/bin/bash\nexport PATH=$PATH\nexport LD_LIBRARY_PATH=$LD_LIBRARY_
     # 更新apt-get以及openssh-server, wget, vim, sshpass, net-tools, psmisc
     # psmisc包含Hadoop HA - sshfence所需的fuser工具
     apt-get update && apt-get install -y openssh-server wget vim sshpass lsof net-tools psmisc rsync zip && \
+    rm -rf /var/lib/apt/lists/* && \
+    # 清除下载的deb包
+    apt-get clean && \
     # 建立haspark脚本目录
     mkdir -p /opt/somebottle/haspark && \
     # 建立工具脚本目录
