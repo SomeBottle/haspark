@@ -44,9 +44,10 @@ ENV HADOOP_LAUNCH_MODE="general" \
     GN_NODEMANAGER_WITH_RESOURCEMANAGER="false" \
     GN_HDFS_SETUP_ON_STARTUP="false" \
     GN_YARN_SETUP_ON_STARTUP="false" \
+    GN_ZOOKEEPER_START_ON_STARTUP="false" \
     HA_HDFS_NAMESERVICE="hacluster" \
     HA_HDFS_SETUP_ON_STARTUP="false" \
-    HA_YARN_SETUP_ON_STARTUP="false"
+    HA_YARN_SETUP_ON_STARTUP="false" 
 
 # 以Root用户完成
 USER root
@@ -57,7 +58,9 @@ COPY resources/sources.list /tmp/sources.list
 # 将路径环境变量写入/etc/profile.d/path_env.sh
 RUN echo -e "#!/bin/bash\nexport PATH=$PATH\nexport LD_LIBRARY_PATH=$LD_LIBRARY_PATH" > /etc/profile.d/path_env.sh && \
     # 将Hadoop部分环境变量写入/etc/profile.d/hadoop.sh
-    echo -e "#!/bin/bash\nexport HADOOP_HOME=$HADOOP_HOME\nexport HADOOP_CONF_DIR=$HADOOP_CONF_DIR" >> /etc/profile.d/hadoop.sh && \ 
+    echo -e "#!/bin/bash\nexport HADOOP_HOME=$HADOOP_HOME\nexport HADOOP_CONF_DIR=$HADOOP_CONF_DIR\nexport HADOOP_LOG_DIR=$HADOOP_LOG_DIR\nexport HADOOP_VER=$HADOOP_VER" >> /etc/profile.d/hadoop.sh && \ 
+    # 将Zookeeper部分环境变量写入/etc/profile.d/zookeeper.sh
+    echo -e "#!/bin/bash\nexport ZOOKEEPER_HOME=$ZOOKEEPER_HOME\nexport ZOOKEEPER_CONF_DIR=$ZOOKEEPER_CONF_DIR\nexport ZOOKEEPER_VER=$ZOOKEEPER_VER\nexport ZOOKEEPER_DATA_DIR=$ZOOKEEPER_DATA_DIR" >> /etc/profile.d/zookeeper.sh && \
     # 创建容器启动标识文件
     touch $INIT_FLAG_FILE && \
     # 先生成一个临时SSH密码，用于首次启动时交换ssh密钥
@@ -99,6 +102,8 @@ RUN wget https://mirrors.tuna.tsinghua.edu.cn/apache/hadoop/common/hadoop-${HADO
     tar -zxf hadoop-${HADOOP_VER}.tar.gz && \
     mv hadoop-${HADOOP_VER} hadoop && \
     rm -f hadoop-${HADOOP_VER}.tar.gz && \
+    # 删除hadoop的docs，可以省下很多空间
+    rm -rf ${HADOOP_HOME}/share/doc && \
     # 移动配置文件到对应目录
     mv /tmp/tmp_configs/core-site.xml ${HADOOP_CONF_DIR}/core-site.xml && \
     mv /tmp/tmp_configs/hdfs-site.xml ${HADOOP_CONF_DIR}/hdfs-site.xml && \
@@ -114,6 +119,8 @@ RUN wget https://mirrors.tuna.tsinghua.edu.cn/apache/hadoop/common/hadoop-${HADO
     tar -zxf apache-zookeeper-${ZOOKEEPER_VER}-bin.tar.gz && \
     mv apache-zookeeper-${ZOOKEEPER_VER}-bin zookeeper && \
     rm -f apache-zookeeper-${ZOOKEEPER_VER}-bin.tar.gz && \
+    # 删除zookeeper的docs
+    rm -rf ${ZOOKEEPER_HOME}/docs && \
     # 拷贝Zookeeper基础配置文件
     cp /opt/zookeeper/conf/zoo_sample.cfg /opt/zookeeper/conf/zoo.cfg && \
     # 修改Zookeeper数据目录

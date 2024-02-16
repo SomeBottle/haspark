@@ -4,6 +4,11 @@
 
 . /opt/somebottle/haspark/utils.sh # 导入工具函数
 
+if [[ "$GN_ZOOKEEPER_START_ON_STARTUP" == "true" ]]; then
+    # 容器启动时，启动Zookeeper守护进程
+    $ZOOKEEPER_HOME/bin/zkServer.sh start
+fi
+
 if [ -e $INIT_FLAG_FILE ]; then
     # 仅在容器初次启动时执行
     echo "Initializing Hadoop (General)."
@@ -15,6 +20,8 @@ if [ -e $INIT_FLAG_FILE ]; then
     remove_ha_conf $HADOOP_CONF_DIR/mapred-site.xml
     # 修改core-site.xml
     sed -i "s/%%HDFS_DEF_HOST%%/$GN_NAMENODE_HOST:8020/g" $HADOOP_CONF_DIR/core-site.xml
+    # 将HDFS服务地址加入持久环境变量
+    echo "export HDFS_SERVICE_ADDR='${GN_NAMENODE_HOST}:8020'" >>/etc/profile.d/sh_basics.sh
     # 修改hdfs-site.xml
     sed -i "s/%%HDFS_REPLICATION%%/$HADOOP_HDFS_REPLICATION/g" $HADOOP_CONF_DIR/hdfs-site.xml
     # 修改mapred-site.xml

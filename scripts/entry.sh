@@ -1,12 +1,17 @@
 #!/bin/bash
 # 容器启动时执行的脚本
 
+. /opt/somebottle/haspark/utils.sh # 导入工具函数
+
 # 指定家目录
 # 不指定的话，ssh-copy-id没法正常运作
 export HOME="$(eval echo ~$(whoami))"
 # 各组件的守护进程启动顺序
 export HDFS_DAEMON_SEQ_FILE=/opt/somebottle/haspark/daemon_sequence/hdfs.seq
 export YARN_DAEMON_SEQ_FILE=/opt/somebottle/haspark/daemon_sequence/yarn.seq
+
+# Zookeeper Quorum列表
+export ZOOKEEPER_QUORUM=$(join_by "$SH_HOSTS" ',' ':2181')
 
 # 创建容器部署日志目录
 mkdir -p /opt/somebottle/haspark/logs
@@ -23,7 +28,8 @@ export HOME='$HOME'\n\
 export HDFS_DAEMON_SEQ_FILE='$HDFS_DAEMON_SEQ_FILE'\n\
 export YARN_DAEMON_SEQ_FILE='$YARN_DAEMON_SEQ_FILE'\n\
 export TEMP_PASS_FILE='$TEMP_PASS_FILE'\n\
-export INIT_FLAG_FILE='$INIT_FLAG_FILE'\n" >/etc/profile.d/sh_basics.sh
+export INIT_FLAG_FILE='$INIT_FLAG_FILE'\n\
+export ZOOKEEPER_QUORUM='$ZOOKEEPER_QUORUM'\n" >/etc/profile.d/sh_basics.sh
 
 # 把JAVA_HOME也输出到/etc/profile
 echo "export JAVA_HOME=$JAVA_HOME" >/etc/profile.d/java.sh

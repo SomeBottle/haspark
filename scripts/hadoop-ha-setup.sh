@@ -16,9 +16,6 @@ $ZOOKEEPER_HOME/bin/zkServer.sh start
 # 协调: 等待所有结点的Zookeeper守护进程启动
 wait_for_java_process_on_specified_nodes QuorumPeerMain "$SH_HOSTS"
 
-# Zookeeper Quorum列表
-zookeeper_nodes=$(join_by "$SH_HOSTS" ',' ':2181')
-
 # **************************************************** 如果需要HDFS高可用
 if [[ "$HA_HDFS_SETUP_ON_STARTUP" == "true" ]]; then
 
@@ -33,9 +30,11 @@ if [[ "$HA_HDFS_SETUP_ON_STARTUP" == "true" ]]; then
         # ***********修改core-site.xml***********
         # HDFS的NameNode的NameService名
         sed -i "s/%%HDFS_DEF_HOST%%/$HA_HDFS_NAMESERVICE/g" $HADOOP_CONF_DIR/core-site.xml
+        # 将HDFS服务地址加入持久环境变量
+        echo "export HDFS_SERVICE_ADDR='$HA_HDFS_NAMESERVICE'" >>/etc/profile.d/sh_basics.sh
         # 修改hdfs-site.xml
         sed -i "s/%%HDFS_NAMESERVICE%%/$HA_HDFS_NAMESERVICE/g" $HADOOP_CONF_DIR/hdfs-site.xml
-        sed -i "s/%%ZK_ADDRS%%/$zookeeper_nodes/g" $HADOOP_CONF_DIR/core-site.xml
+        sed -i "s/%%ZK_ADDRS%%/$ZOOKEEPER_QUORUM/g" $HADOOP_CONF_DIR/core-site.xml
 
         # ***********修改hdfs-site.xml***********
         # HDFS副本数
@@ -201,7 +200,7 @@ if [[ "$HA_YARN_SETUP_ON_STARTUP" == "true" ]]; then
         # 处理完成后把HA_REPEAT_XXX_START/END部分用生成的配置替换
         replace_repeat_conf 'RESOURCEMANAGER' "$generated_rm_conf" $HADOOP_CONF_DIR/yarn-site.xml
         # Zookeeper节点地址
-        sed -i "s/%%ZK_ADDRS%%/$zookeeper_nodes/g" $HADOOP_CONF_DIR/yarn-site.xml
+        sed -i "s/%%ZK_ADDRS%%/$ZOOKEEPER_QUORUM/g" $HADOOP_CONF_DIR/yarn-site.xml
     fi
 
     # ################# 容器每次启动都执行的部分 SECTION-START #################

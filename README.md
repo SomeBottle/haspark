@@ -65,6 +65,7 @@ docker pull somebottle/haspark
 | `GN_NODEMANAGER_WITH_RESOURCEMANAGER` | 在ResourceManager所在节点是否启动NodeManager | `"false"` |
 | `GN_HDFS_SETUP_ON_STARTUP` | 是否在容器启动时自动启动HDFS各个节点的守护进程 | `"false"` |  
 | `GN_YARN_SETUP_ON_STARTUP` | 是否在容器启动时自动启动Yarn各个节点的守护进程 | `"false"` |  
+| `GN_ZOOKEEPER_START_ON_STARTUP` | 是否在容器启动时自动启动Zookeeper各个节点的守护进程 | `"false"` |  
 
 ### 3.4. Hadoop高可用（HA）分布式
 
@@ -83,6 +84,8 @@ docker pull somebottle/haspark
 
 除了 `bitnami/spark` 提供的只读环境变量外，本镜像还提供了:  
 
+(可以调用 `source /etc/profile` 来载入这些环境变量到当前 Shell 中)    
+
 | 名称 | 说明 | 
 | --- | --- | 
 |`ZOOKEEPER_VER` | Zookeeper版本 | 
@@ -93,8 +96,8 @@ docker pull somebottle/haspark
 |`HADOOP_HOME` | Hadoop安装目录 | 
 |`HADOOP_CONF_DIR` | Hadoop配置文件目录 |
 |`HADOOP_LOG_DIR` | Hadoop日志目录 | 
-
-
+|`HDFS_SERVICE_ADDR`| HDFS 服务地址。示例: 普通分布式-> `host:port`; HA 分布式-> `mycluster` |
+|`ZOOKEEPER_QUORUM`| Zookeeper集群各节点地址，逗号分隔。示例: `host1:2181,host2:2181,host3:2181` |
 
 ## 4. 提供的脚本
 
@@ -160,7 +163,7 @@ version: '3'
 
 services:
   haspark-main:
-    image: somebottle/haspark:3.1.3
+    image: somebottle/haspark:3.1.4
     hostname: shmain
     env_file: ./conf.env
     environment:
@@ -178,7 +181,7 @@ services:
       - '9870:9870'
       - '19888:19888'
   haspark-worker-1:
-    image: somebottle/haspark:3.1.3
+    image: somebottle/haspark:3.1.4
     hostname: shworker1
     env_file: ./conf.env
     environment:
@@ -194,7 +197,7 @@ services:
     ports:
       - '8081:8081'
   haspark-worker-2:
-    image: somebottle/haspark:3.1.3
+    image: somebottle/haspark:3.1.4
     hostname: shworker2
     env_file: ./conf.env
     environment:
