@@ -23,19 +23,20 @@ ENV ZOOKEEPER_VER="3.9.1" \
     HADOOP_CONF_DIR="/opt/hadoop/etc/hadoop" \
     # Hadoop日志目录
     HADOOP_LOG_DIR="/opt/hadoop/logs"
+# 用户.ssh配置目录
+ENV USR_SSH_CONF_DIR="/root/.ssh" \
+    # 容器初次启动标识文件
+    INIT_FLAG_FILE="/root/init_flag" \
+    # 定义PATH
+    HASPARK_PATH="$HADOOP_HOME/bin:/opt/somebottle/haspark/tools:$ZOOKEEPER_HOME/bin" \
+    HASPARK_LD_LIBRARY_PATH="$HADOOP_HOME/lib/native"
 # 把Hadoop目录加入环境变量
-ENV HASPARK_PATH="$HADOOP_HOME/bin:/opt/somebottle/haspark/tools:$ZOOKEEPER_HOME/bin" \
-    HASPARK_LD_LIBRARY_PATH="$HADOOP_HOME/lib/native" \
-    PATH="$HASPARK_PATH:$PATH" \
+ENV PATH="$HASPARK_PATH:$PATH" \
     # 把Hadoop本地库加入动态链接库路径
     # 以免Spark或Hadoop找不到Hadoop Native Library
     LD_LIBRARY_PATH="$HASPARK_LD_LIBRARY_PATH:$LD_LIBRARY_PATH" \
     # 临时密码文件路径加入环境变量
     TEMP_PASS_FILE="/root/temp.pass"
-# 用户.ssh配置目录
-ENV USR_SSH_CONF_DIR="/root/.ssh" \
-    # 容器初次启动标识文件
-    INIT_FLAG_FILE="/root/init_flag"
 # 以下是一些环境变量默认值，用于Hadoop初始化
 ENV HADOOP_LAUNCH_MODE="general" \
     HADOOP_HDFS_REPLICATION="2" \
