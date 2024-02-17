@@ -98,6 +98,9 @@ docker pull somebottle/haspark
 |`HADOOP_LOG_DIR` | Hadoop日志目录 | 
 |`HDFS_SERVICE_ADDR`| HDFS 服务地址。示例: 普通分布式-> `host:port`; HA 分布式-> `mycluster` |
 |`ZOOKEEPER_QUORUM`| Zookeeper集群各节点地址，逗号分隔。示例: `host1:2181,host2:2181,host3:2181` |
+|`TEMP_PASS_FILE`| SSH 临时密码文件的路径，在 SSH 公钥自动交换完毕后此文件将被自动删除（可用于判断 SSH 服务是否就绪） |
+|`INIT_FLAG_FILE`| 容器初始化标记文件，在**Hadoop**初始化完毕后，此文件会被自动删除 |
+
 
 ## 4. 提供的脚本
 
@@ -163,7 +166,7 @@ version: '3'
 
 services:
   haspark-main:
-    image: somebottle/haspark:3.1.4
+    image: somebottle/haspark:3.1.5
     hostname: shmain
     env_file: ./conf.env
     environment:
@@ -181,7 +184,7 @@ services:
       - '9870:9870'
       - '19888:19888'
   haspark-worker-1:
-    image: somebottle/haspark:3.1.4
+    image: somebottle/haspark:3.1.5
     hostname: shworker1
     env_file: ./conf.env
     environment:
@@ -197,7 +200,7 @@ services:
     ports:
       - '8081:8081'
   haspark-worker-2:
-    image: somebottle/haspark:3.1.4
+    image: somebottle/haspark:3.1.5
     hostname: shworker2
     env_file: ./conf.env
     environment:

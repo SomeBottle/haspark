@@ -24,10 +24,12 @@ ENV ZOOKEEPER_VER="3.9.1" \
     # Hadoop日志目录
     HADOOP_LOG_DIR="/opt/hadoop/logs"
 # 把Hadoop目录加入环境变量
-ENV PATH="$HADOOP_HOME/bin:/opt/somebottle/haspark/tools:$ZOOKEEPER_HOME/bin:$PATH" \
+ENV HASPARK_PATH="$HADOOP_HOME/bin:/opt/somebottle/haspark/tools:$ZOOKEEPER_HOME/bin" \
+    HASPARK_LD_LIBRARY_PATH="$HADOOP_HOME/lib/native" \
+    PATH="$HASPARK_PATH:$PATH" \
     # 把Hadoop本地库加入动态链接库路径
     # 以免Spark或Hadoop找不到Hadoop Native Library
-    LD_LIBRARY_PATH="$HADOOP_HOME/lib/native:$LD_LIBRARY_PATH" \
+    LD_LIBRARY_PATH="$HASPARK_LD_LIBRARY_PATH:$LD_LIBRARY_PATH" \
     # 临时密码文件路径加入环境变量
     TEMP_PASS_FILE="/root/temp.pass"
 # 用户.ssh配置目录
@@ -56,7 +58,7 @@ USER root
 COPY resources/sources.list /tmp/sources.list
 
 # 将路径环境变量写入/etc/profile.d/path_env.sh
-RUN echo -e "#!/bin/bash\nexport PATH=$PATH\nexport LD_LIBRARY_PATH=$LD_LIBRARY_PATH" > /etc/profile.d/path_env.sh && \
+RUN echo -e "#!/bin/bash\nexport PATH=$HASPARK_PATH:\$PATH\nexport LD_LIBRARY_PATH=$HASPARK_LD_LIBRARY_PATH:\$LD_LIBRARY_PATH" > /etc/profile.d/path_env.sh && \
     # 将Hadoop部分环境变量写入/etc/profile.d/hadoop.sh
     echo -e "#!/bin/bash\nexport HADOOP_HOME=$HADOOP_HOME\nexport HADOOP_CONF_DIR=$HADOOP_CONF_DIR\nexport HADOOP_LOG_DIR=$HADOOP_LOG_DIR\nexport HADOOP_VER=$HADOOP_VER" >> /etc/profile.d/hadoop.sh && \ 
     # 将Zookeeper部分环境变量写入/etc/profile.d/zookeeper.sh
