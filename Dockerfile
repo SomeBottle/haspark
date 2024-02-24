@@ -36,7 +36,9 @@ ENV PATH="$HASPARK_PATH:$PATH" \
     # 以免Spark或Hadoop找不到Hadoop Native Library
     LD_LIBRARY_PATH="$HASPARK_LD_LIBRARY_PATH:$LD_LIBRARY_PATH" \
     # 临时密码文件路径加入环境变量
-    TEMP_PASS_FILE="/root/temp.pass"
+    TEMP_PASS_FILE="/root/temp.pass" \
+    # 保留 Bitnami 的环境变量
+    BITNAMI_PATHS="/opt/bitnami/python/bin:/opt/bitnami/java/bin:/opt/bitnami/spark/bin:/opt/bitnami/spark/sbin"
 # 以下是一些环境变量默认值，用于Hadoop初始化
 ENV HADOOP_LAUNCH_MODE="general" \
     HADOOP_HDFS_REPLICATION="2" \
@@ -60,6 +62,8 @@ COPY resources/sources.list /tmp/sources.list
 
 # 将路径环境变量写入/etc/profile.d/path_env.sh
 RUN echo -e "#!/bin/bash\nexport PATH=$HASPARK_PATH:\$PATH\nexport LD_LIBRARY_PATH=$HASPARK_LD_LIBRARY_PATH:\$LD_LIBRARY_PATH" > /etc/profile.d/path_env.sh && \
+    # 将Bitnami环境变量写入/etc/profile.d/bitnami.sh
+    echo -e "#!/bin/bash\nexport PATH=$BITNAMI_PATHS:\$PATH" > /etc/profile.d/bitnami.sh && \
     # 将Hadoop部分环境变量写入/etc/profile.d/hadoop.sh
     echo -e "#!/bin/bash\nexport HADOOP_HOME=$HADOOP_HOME\nexport HADOOP_CONF_DIR=$HADOOP_CONF_DIR\nexport HADOOP_LOG_DIR=$HADOOP_LOG_DIR\nexport HADOOP_VER=$HADOOP_VER" >> /etc/profile.d/hadoop.sh && \ 
     # 将Zookeeper部分环境变量写入/etc/profile.d/zookeeper.sh

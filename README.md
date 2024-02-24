@@ -166,7 +166,7 @@ version: '3'
 
 services:
   haspark-main:
-    image: somebottle/haspark:3.1.5
+    image: somebottle/haspark:3.1.6
     hostname: shmain
     env_file: ./conf.env
     environment:
@@ -184,7 +184,7 @@ services:
       - '9870:9870'
       - '19888:19888'
   haspark-worker-1:
-    image: somebottle/haspark:3.1.5
+    image: somebottle/haspark:3.1.6
     hostname: shworker1
     env_file: ./conf.env
     environment:
@@ -200,7 +200,7 @@ services:
     ports:
       - '8081:8081'
   haspark-worker-2:
-    image: somebottle/haspark:3.1.5
+    image: somebottle/haspark:3.1.6
     hostname: shworker2
     env_file: ./conf.env
     environment:
