@@ -1,6 +1,8 @@
 # 采用bitnami/spark镜像，此镜像基于精简Debian 11系统
 # 基于Spark 3.5.0版本
 # 适配Hadoop 3.3+
+FROM bitnami/java:11.0.23-10 AS openjdk
+
 FROM bitnami/spark:3.5.0
 
 LABEL maintainer="somebottle <somebottle@outlook.com>" \
@@ -8,7 +10,7 @@ LABEL maintainer="somebottle <somebottle@outlook.com>" \
 
 # 环境变量配置
 # Zookeeper版本
-ENV ZOOKEEPER_VER="3.9.1" \
+ENV ZOOKEEPER_VER="3.9.2" \
     # Zookeeper安装目录
     ZOOKEEPER_HOME="/opt/zookeeper" \
     # Zookeeper配置目录
@@ -91,8 +93,13 @@ RUN echo -e "#!/bin/bash\nexport PATH=$HASPARK_PATH:\$PATH\nexport LD_LIBRARY_PA
     # 建立工具脚本目录
     mkdir -p /opt/somebottle/haspark/tools && \
     # 建立临时配置目录
-    mkdir /tmp/tmp_configs
+    mkdir /tmp/tmp_configs && \
+    # 移除镜像中的 OpenJDK 17 
+    rm -rf /opt/bitnami/java
 
+# 把 Java 更换为 OpenJDK 11，因为 Hadoop 尚未支持运行时 Java 17，可能出现问题。
+
+COPY --from=openjdk /opt/bitnami/java /opt/bitnami/java
 
 # 切换到安装目录/opt
 WORKDIR /opt
