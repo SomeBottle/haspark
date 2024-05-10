@@ -28,7 +28,7 @@ docker pull somebottle/haspark
 
 * Hadoop `3.3.6`
 * Spark `3.5.0`  
-* Zookeeper `3.9.1`
+* Zookeeper `3.9.2`
 
 ## 3. 可配置的环境变量  
 
